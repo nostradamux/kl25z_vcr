@@ -59,5 +59,6 @@ int myAtoi(char *str);
 void getCommandReceived();
 void debugStringGreen(const unsigned char *str);
 void debugStringRed(const unsigned char *str);
+void debugStringYellow(const unsigned char *str);
 
 #endif /* DEBUGSERIAL_H_ */

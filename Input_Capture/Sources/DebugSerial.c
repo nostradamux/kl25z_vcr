@@ -99,6 +99,13 @@ void debugStringRed(const unsigned char *str)
 	SendString((unsigned char*)ANSI_COLOR_NO, &deviceData);
 }
 
+void debugStringYellow(const unsigned char *str)
+{
+	SendString((unsigned char*)ANSI_COLOR_YELLOW, &deviceData);
+	SendString(str, &deviceData);
+	SendString((unsigned char*)ANSI_COLOR_NO, &deviceData);
+}
+
 void debugString(const unsigned char *str)
 {
 	SendString(str, &deviceData);
