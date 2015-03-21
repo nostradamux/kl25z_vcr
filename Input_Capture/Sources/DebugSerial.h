@@ -45,9 +45,9 @@ typedef struct {
 } UART_Desc;
  
 void printHex(unsigned char data);
-static void SendChar(unsigned char ch, UART_Desc *desc); 
-static void SendString(const unsigned char *str,  UART_Desc *desc);
-static void InitSerial(void);
+void SendChar(unsigned char ch, UART_Desc *desc); 
+void SendString(const unsigned char *str,  UART_Desc *desc);
+void InitSerial(void);
 void startSerial(void) ;
 void debugString(const unsigned char *str);
 char* itoaDebug(int i, char b[]);
