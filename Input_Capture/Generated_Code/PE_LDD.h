@@ -5,7 +5,7 @@
 **     Processor   : MKL25Z128VLK4
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-15, 22:08, # CodeGen: 0
+**     Date/Time   : 2015-03-22, 14:30, # CodeGen: 23
 **     Abstract    :
 **
 **     Settings    :
@@ -77,6 +77,9 @@
 #include "PwmLdd2.h"
 #include "RxBuf.h"
 #include "AS1.h"
+#include "Speed_Capture.h"
+#include "TU2.h"
+#include "Bit1.h"
 
 
 /*

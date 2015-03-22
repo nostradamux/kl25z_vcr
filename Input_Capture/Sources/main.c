@@ -47,7 +47,9 @@
 #include "PwmLdd2.h"
 #include "RxBuf.h"
 #include "AS1.h"
-
+#include "Speed_Capture.h"
+#include "TU2.h"
+#include "Bit1.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -58,6 +60,10 @@
 #include "DebugSerial.h"
 
 extern movementType movement;
+LDD_TDeviceData *SpeedCapture;
+LDD_TError ErrorSpeedCapture, FlagSpeedCapture;
+volatile uint32_t DataSpeedCapture;
+uint32_t DataSpeedCaptureOld;
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -68,6 +74,12 @@ int main(void)
   uint32_t dutyDirection_old=1000;
   movement.direction=dutyDirection_old;
   movement.speed=dutySpeed_old;
+  uint32_t counterSpeedCapture;
+  uint32_t dutySpeedCapture;
+  uint32_t periodSpeedCapture=50000;
+  uint32_t timeLowSpeed=0;
+  uint32_t timeHighSpeed=0;
+  uint32_t counterPrint=0;
   
   char buffer[10];
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
@@ -75,46 +87,104 @@ int main(void)
   /*** End of Processor Expert internal initialization.                    ***/
 
   /* Write your code here */
-  //startSerial();
-  
+  SpeedCapture = Speed_Capture_Init((LDD_TUserData *)NULL);  
   startSerial();
+  
+  ErrorSpeedCapture  = Speed_Capture_Reset(SpeedCapture);                       /* Reset the counter */
+  FlagSpeedCapture  = 1U;
+
   while (1)
   {
-	  /*
-	  */
-	  
-	  getCommandReceived();
-	  
-	  if(movement.speed!=dutySpeed_old)
-	  {
-		  dutySpeed_old=movement.speed;
-		  Speed_SetDutyUS(50000-dutySpeed_old);
+	  //#define CAPTURE_AND_GENERATE_DEVICE 1
+	  #ifdef CAPTURE_AND_GENERATE_DEVICE
+		  if(FlagSpeedCapture == ERR_OK)
+		  {
+			  FlagSpeedCapture=1;
+			  Speed_Capture_GetCaptureValue(SpeedCapture, &DataSpeedCapture);		  
+			  if(DataSpeedCaptureOld>DataSpeedCapture)
+			  {
+				  counterSpeedCapture=(65535-DataSpeedCaptureOld)+DataSpeedCapture;
+			  }
+			  else
+			  {
+				  counterSpeedCapture=DataSpeedCapture-DataSpeedCaptureOld;
+			  }
+			  DataSpeedCaptureOld=DataSpeedCapture;
+			  /*TODO!: coger el nivel del pin para saber si estamos midiendo
+			   * el duty o la frecuencia
+			   */
+			  if(counterSpeedCapture < 25000) //duty never will be less that 50%
+			  {
+				  timeHighSpeed=counterSpeedCapture*1.53;			  
+				  LEDB_Neg(); 
+			  }
+			  else
+			  {
+				  timeLowSpeed=counterSpeedCapture*1.53;			  
+			  }
+			  if(counterPrint++==10)
+			  {
+				counterPrint=0;
+				debugString((unsigned char *)"TimeHigh ");			  
+				itoaDebug(timeHighSpeed,&buffer[0]);
+				debugStringRed((unsigned char *)buffer);
+				debugString((unsigned char *)"us.TimeLow ");			  
+				itoaDebug(timeLowSpeed,&buffer[0]);
+				debugStringRed((unsigned char *)buffer);
+				debugString((unsigned char *)"us.Total ");			  
+				itoaDebug(timeLowSpeed+timeHighSpeed,&buffer[0]);
+				debugStringRed((unsigned char *)buffer);
+				debugString((unsigned char *)"us\n\r");
+			  }
+			  movement.speed=timeHighSpeed;
+		  }		  	  
+		  if(movement.speed!=dutySpeed_old)
+		  {
+			  dutySpeed_old=movement.speed;
+			  Speed_SetDutyUS(50000-dutySpeed_old);
+			  
+			  debugString((unsigned char *)"New duty speed:");
+			  itoaDebug(movement.speed,&buffer[0]);
+			  debugStringGreen((unsigned char *)buffer);
+			  debugString((unsigned char *)"\n\r");
+		  }
+		  if(movement.direction!=dutyDirection_old)
+		  {
+			  dutyDirection_old=movement.direction;
+			  Direction_SetDutyUS(50000-dutyDirection_old);
+			  
+			  debugString((unsigned char *)"New duty direction:");
+			  itoaDebug(movement.direction,buffer);
+			  debugStringRed((unsigned char *)buffer);
+			  debugString((unsigned char *)"\n\r");
+		  }
+	  #else //GENERATE PWM from CONSOLE
+		  getCommandReceived();
 		  
-		  debugString((unsigned char *)"New duty speed:");
-		  itoaDebug(movement.speed,&buffer[0]);
-		  debugStringRed((unsigned char *)buffer);
-		  debugString((unsigned char *)"\n\r");
-	  }
-	  if(movement.direction!=dutyDirection_old)
-	  {
-		  dutyDirection_old=movement.direction;
-		  Direction_SetDutyUS(50000-dutyDirection_old);
-		  
-		  debugString((unsigned char *)"New duty direction:");
-		  itoaDebug(movement.direction,buffer);
-		  debugStringGreen((unsigned char *)buffer);
-		  debugString((unsigned char *)"\n\r");
-	  }
-	  /*Speed_SetDutyUS(50000-duty);
-	  Direction_SetDutyUS(50000-duty);
-	  duty+=10;
-	  if(duty==2000)
-	  {
-		  duty=1000;
-	  }
-	  */
-	  WAIT1_Waitms(50);
-	  LEDB_Neg();  
+		  if(movement.speed!=dutySpeed_old)
+		  {
+			  dutySpeed_old=movement.speed;
+			  Speed_SetDutyUS(50000-dutySpeed_old);
+			  
+			  debugString((unsigned char *)"New duty speed:");
+			  itoaDebug(movement.speed,&buffer[0]);
+			  debugStringGreen((unsigned char *)buffer);
+			  debugString((unsigned char *)"\n\r");
+		  }
+		  if(movement.direction!=dutyDirection_old)
+		  {
+			  dutyDirection_old=movement.direction;
+			  Direction_SetDutyUS(50000-dutyDirection_old);
+			  
+			  debugString((unsigned char *)"New duty direction:");
+			  itoaDebug(movement.direction,buffer);
+			  debugStringRed((unsigned char *)buffer);
+			  debugString((unsigned char *)"\n\r");
+		  }
+		  WAIT1_Waitms(50);
+		  LEDG_Neg();
+	 #endif
+	  	   
 	  
   }
   /* For example: for(;;) { } */

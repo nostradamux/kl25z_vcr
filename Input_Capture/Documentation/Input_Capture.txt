@@ -121,6 +121,47 @@ Module "AS1"       (component FRDM_KL25Z_UART)
                 the status is returned and cleared (set to "false" state). This method is available only if a peripheral 
                 supports this feature.
 
+Module "Speed_Capture" (component Capture_LDD)
+   - Speed_Capture_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors 
+                and sets interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. code"> is 
+                set to "yes" value then the device is also enabled (see the description of the <Enable> method). In this case 
+                the <Enable> method is not necessary and needn't to be generated. This method can be called only once. Before 
+                the second call of Init the <Deinit> must be called first.
+   - Speed_Capture_Enable -Enables the component - the external events are counted.
+   - Speed_Capture_Disable -Disables the component - the external events are not counted.
+   - Speed_Capture_Reset -This method resets the counter register (see implementation note in <General Info>).
+   - Speed_Capture_GetCaptureValue -This method gets the last value captured by enabled timer (see implementation note in 
+                <General Info>). The method does not return valid value after initialization or after <Reset> until new capture 
+                event (even if the returned Error code is ERR_OK).
+   - Speed_Capture_SelectCaptureEdge -Sets the type of edge for input capture.
+
+Module "TU2"       (component TimerUnit_LDD)
+   - TU2_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and sets 
+                interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. code"> is set to 
+                "yes" value then the device is also enabled (see the description of the <Enable> method). In this case the 
+                <Enable> method is not necessary and needn't to be generated. This method can be called only once. Before the 
+                second call of Init the <Deinit> must be called first.
+   - TU2_Enable -Enables the component - it starts the signal generation. Events may be generated (see SetEventMask). The 
+                method is not available if the counter can't be disabled/enabled by HW.
+   - TU2_Disable -Disables the component - it stops signal generation and events calling. The method is not available if the 
+                counter can't be disabled/enabled by HW.
+   - TU2_ResetCounter -Resets counter. If counter is counting up then it is set to zero. If counter is counting down then 
+                counter is updated to the reload value.   The method is not available if HW doesn't allow resetting of the 
+                counter.
+   - TU2_GetCaptureValue -Returns the content of capture register specified by the parameter ChannelIdx. This method is 
+                available when at least one channel is configured.
+   - TU2_SelectCaptureEdge -Sets the type of edge for input capture on selected channel input. This method is available when at 
+                least one channel is configured.
+
+Module "Bit1"      (component BitIO_LDD)
+   - Bit1_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and sets 
+                interrupt priority, sets pin routing, sets timing, etc. If the "Enable in init. code" is set to "yes" value 
+                then the device is also enabled(see the description of the Enable() method). In this case the Enable() method 
+                is not necessary and needn't to be generated.
+   - Bit1_GetVal -Returns the input/output value. If the direction is [input] then the input value of the pin is read and 
+                returned. If the direction is [output] then the last written value is read and returned (see <Safe mode> 
+                property for limitations). This method cannot be disabled if direction is [input].
+
 Module "Cpu"       (component MKL25Z128LK4)
 
 ===================================================================================
