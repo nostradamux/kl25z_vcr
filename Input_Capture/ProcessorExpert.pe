@@ -3,7 +3,7 @@
   <Header>
     <Name>Input_Capture</Name>
     <SavedBy>Administrador</SavedBy>
-    <ModificationStamp>24</ModificationStamp>
+    <ModificationStamp>25</ModificationStamp>
     <Date>2015-03-28</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.9.0.RT6_b1411-0406</PEversion>
@@ -12584,7 +12584,7 @@
     <Name>Speed_Capture</Name>
     <CompNumb>44</CompNumb>
     <CompEnabled>true</CompEnabled>
-    <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
+    <GenCodeMode>DONT_WRITE</GenCodeMode>
     <IconName>TRIGGER</IconName>
     <UserFolderName />
     <Comment lines_count="0" />
@@ -13075,7 +13075,7 @@
     <Name>Direction_Capture</Name>
     <CompNumb>57</CompNumb>
     <CompEnabled>true</CompEnabled>
-    <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
+    <GenCodeMode>DONT_WRITE</GenCodeMode>
     <IconName>TRIGGER</IconName>
     <UserFolderName />
     <Comment lines_count="0" />
@@ -13566,7 +13566,7 @@
     <Name>Tacometer_Capture</Name>
     <CompNumb>59</CompNumb>
     <CompEnabled>true</CompEnabled>
-    <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
+    <GenCodeMode>DONT_WRITE</GenCodeMode>
     <IconName>TRIGGER</IconName>
     <UserFolderName />
     <Comment lines_count="0" />
@@ -14057,7 +14057,7 @@
     <Name>TU2</Name>
     <CompNumb>45</CompNumb>
     <CompEnabled>true</CompEnabled>
-    <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
+    <GenCodeMode>DONT_WRITE</GenCodeMode>
     <IconName>CLOCKS_LDD</IconName>
     <UserFolderName>Referenced_Components</UserFolderName>
     <Comment lines_count="0" />
@@ -15186,7 +15186,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>ChannelCmpIntVector2</ItemSymbol>
-        <Value>INT_TPM0</Value>
+        <Value />
         <ItemWasNeverEnabledInChgScript>true</ItemWasNeverEnabledInChgScript>
       </ItemState>
       <ItemState>
@@ -15989,7 +15989,7 @@
         <ItemSymbol>Inp</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>EXTAL0/PTA18/UART1_RX/TPM_CLKIN0</Value>
+        <Value>PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>

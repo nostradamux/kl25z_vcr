@@ -1470,7 +1470,7 @@ PE_DEBUGHALT();
         <Receiver_input v="Not inverted" />
         <Break_generation_length v="10/11 bits" />
         <boolgroup name="Receiver" v="Enabled">
-          <RxD v="EXTAL0/PTA18/UART1_RX/TPM_CLKIN0" />
+          <RxD v="PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa" />
         </boolgroup>
         <boolgroup name="Transmitter" v="Enabled">
           <TxD v="PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3" />

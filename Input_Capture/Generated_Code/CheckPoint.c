@@ -6,7 +6,7 @@
 **     Component   : Serial_LDD
 **     Version     : Component 01.187, Driver 01.12, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-28, 10:26, # CodeGen: 28
+**     Date/Time   : 2015-03-28, 20:47, # CodeGen: 32
 **     Abstract    :
 **         This component "Serial_LDD" implements an asynchronous serial
 **         communication. The component supports different settings of
@@ -37,7 +37,7 @@
 **            Receiver input                               : Not inverted
 **            Break generation length                      : 10/11 bits
 **            Receiver                                     : Enabled
-**              RxD                                        : EXTAL0/PTA18/UART1_RX/TPM_CLKIN0
+**              RxD                                        : PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa
 **              RxD pin signal                             : 
 **            Transmitter                                  : Enabled
 **              TxD                                        : PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3
@@ -179,13 +179,13 @@ LDD_TDeviceData* CheckPoint_Init(LDD_TUserData *UserDataPtr)
   INT_UART1__DEFAULT_RTOS_ISRPARAM = DeviceDataPrv;
   /* SIM_SCGC4: UART1=1 */
   SIM_SCGC4 |= SIM_SCGC4_UART1_MASK;
-  /* PORTA_PCR18: ISF=0,MUX=3 */
-  PORTA_PCR18 = (uint32_t)((PORTA_PCR18 & (uint32_t)~(uint32_t)(
-                 PORT_PCR_ISF_MASK |
-                 PORT_PCR_MUX(0x04)
-                )) | (uint32_t)(
-                 PORT_PCR_MUX(0x03)
-                ));
+  /* PORTC_PCR3: ISF=0,MUX=3 */
+  PORTC_PCR3 = (uint32_t)((PORTC_PCR3 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x04)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x03)
+               ));
   /* PORTC_PCR4: ISF=0,MUX=3 */
   PORTC_PCR4 = (uint32_t)((PORTC_PCR4 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
