@@ -6,7 +6,7 @@
 **     Component   : Capture_LDD
 **     Version     : Component 01.010, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-22, 14:00, # CodeGen: 22
+**     Date/Time   : 2015-03-28, 10:35, # CodeGen: 31
 **     Abstract    :
 **          This component "Capture_LDD" simply implements the capture function
 **          of timer. The counter counts the same way as in free run mode. On
@@ -28,7 +28,7 @@
 **            Interrupt priority                           : high priority
 **          Event                                          : 
 **            Input pin                                    : ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0
-**            Input pin signal                             : 
+**            Input pin signal                             : Speed_Capture_Signal
 **            Edge                                         : both edges
 **            Maximum time of event                        : 100 ms
 **          Initialization                                 : 
@@ -119,6 +119,8 @@ typedef struct {
   LDD_TDeviceData *LinkedDeviceDataPtr;
   bool EnUser;                         /* Enable/Disable device */
   LDD_TimerUnit_TEdge Edge;            /* Type of the signal edges that are captured */
+  uint16_t CntrState;                  /* Content of counter */
+  LDD_TEventMask EnEvents;             /* Enable/Disable events mask */
   LDD_TUserData *UserDataPtr;          /* RTOS device data structure */
 } Speed_Capture_TDeviceData;
 
@@ -127,7 +129,7 @@ typedef Speed_Capture_TDeviceData *Speed_Capture_TDeviceDataPtr; /* Pointer to t
 /* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
 static Speed_Capture_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 
-#define CHANNEL 0x00U
+#define CHANNEL 0x01U
 #define AVAILABLE_EVENTS_MASK (LDD_TEventMask)(LDD_CAPTURE_ON_CAPTURE)
 /*
 ** ===================================================================
@@ -160,7 +162,9 @@ LDD_TDeviceData* Speed_Capture_Init(LDD_TUserData *UserDataPtr)
   /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
   DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
   DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
+  DeviceDataPrv->EnEvents = 0x01u;     /* Initial event mask */
   DeviceDataPrv->Edge = EDGE_BOTH;     /* Initial type of edge */
+  DeviceDataPrv->CntrState = 0U;       /* Initial state of variable */
   DeviceDataPrv->EnUser = TRUE;        /* Set the flag "device enabled" */
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_Speed_Capture_ID,DeviceDataPrv);
@@ -172,6 +176,7 @@ LDD_TDeviceData* Speed_Capture_Init(LDD_TUserData *UserDataPtr)
     /* {Default RTOS Adapter} Driver memory deallocation: Dynamic allocation is simulated, no deallocation code is generated */
     return NULL;                       /* If so, then the Capture initialization is also unsuccessful */
   }
+  (void)TU2_SelectCaptureEdge(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, DeviceDataPrv->Edge); /* Enable capture */
   return ((LDD_TDeviceData *)DeviceDataPrv); /* Return pointer to the device data structure */
 }
 
@@ -198,7 +203,7 @@ LDD_TError Speed_Capture_Enable(LDD_TDeviceData *DeviceDataPtr)
 
   if (!DeviceDataPrv->EnUser) {        /* Is the device disabled by user? */
     DeviceDataPrv->EnUser = TRUE;      /* If yes then set the flag "device enabled" */
-    (void)TU2_Enable(DeviceDataPrv->LinkedDeviceDataPtr); /* Enable TimerUnit */
+    (void)TU2_SelectCaptureEdge(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, DeviceDataPrv->Edge); /* Enable capture */
   }
   return ERR_OK;
 }
@@ -226,7 +231,7 @@ LDD_TError Speed_Capture_Disable(LDD_TDeviceData *DeviceDataPtr)
 
   if (DeviceDataPrv->EnUser) {         /* Is the device enabled by user? */
     DeviceDataPrv->EnUser = FALSE;     /* If yes then set the flag "device enabled" */
-   (void)TU2_Disable(DeviceDataPrv->LinkedDeviceDataPtr); /* Disable TimerUnit */
+   (void)TU2_SelectCaptureEdge(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, EDGE_NONE); /* Disable capture */
   }
   return ERR_OK;
 }
@@ -253,7 +258,7 @@ LDD_TError Speed_Capture_Reset(LDD_TDeviceData *DeviceDataPtr)
 {
   Speed_Capture_TDeviceData *DeviceDataPrv = (Speed_Capture_TDeviceData *)DeviceDataPtr;
 
-  TU2_ResetCounter(DeviceDataPrv->LinkedDeviceDataPtr); /* Reset counter register */
+  DeviceDataPrv->CntrState = TU2_GetCounterValue(DeviceDataPrv->LinkedDeviceDataPtr); /* Load content of counter register to variable CntrState */
   return ERR_OK;
 }
 
@@ -287,6 +292,7 @@ LDD_TError Speed_Capture_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, Speed_C
   uint16_t Ticks;
 
   (void)TU2_GetCaptureValue(DeviceDataPrv->LinkedDeviceDataPtr, CHANNEL, &Ticks);
+  Ticks -= DeviceDataPrv->CntrState;
   *ValuePtr = (Speed_Capture_TValueType) Ticks;
   return ERR_OK;
 }
@@ -321,7 +327,7 @@ LDD_TError Speed_Capture_SelectCaptureEdge(LDD_TDeviceData *DeviceDataPtr, LDD_T
 
 /*
 ** ===================================================================
-**     Method      :  Speed_Capture_TU2_OnChannel0 (component Capture_LDD)
+**     Method      :  Speed_Capture_TU2_OnChannel1 (component Capture_LDD)
 **
 **     Description :
 **         The method services the event of the linked component TU2 and 
@@ -329,12 +335,14 @@ LDD_TError Speed_Capture_SelectCaptureEdge(LDD_TDeviceData *DeviceDataPtr, LDD_T
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
 */
-void TU2_OnChannel0(LDD_TUserData *UserDataPtr)
+void TU2_OnChannel1(LDD_TUserData *UserDataPtr)
 {
   Speed_Capture_TDeviceData *DeviceDataPrv = PE_LDD_DeviceDataList[PE_LDD_COMPONENT_Speed_Capture_ID];
 
   (void)UserDataPtr;                   /* Parameter is not used, suppress unused argument warning */
-  Speed_Capture_OnCapture(DeviceDataPrv->UserDataPtr); /* Invoke OnOverrun event */
+  if (DeviceDataPrv->EnEvents & LDD_CAPTURE_ON_CAPTURE) { /* Is the event enabled? */
+    Speed_Capture_OnCapture(DeviceDataPrv->UserDataPtr); /* Invoke OnOverrun event */
+  }
 }
 
 /* END Speed_Capture. */

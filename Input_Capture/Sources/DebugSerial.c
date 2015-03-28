@@ -143,9 +143,14 @@ void InitSerial(void) {
 void startSerial()
 {
   InitSerial();
-  SendString((unsigned char*)"\r\n******************************\r\n", &deviceData);
-  SendString((unsigned char*)"\r\nStarting FDRM KL25 PWM   \r\n", &deviceData);
-  SendString((unsigned char*)"\r\n******************************\r\n", &deviceData);
+  SendString((unsigned char*)VERSION, &deviceData);
+  SendString((unsigned char*)"\r\n*******************************************************\r\n", &deviceData);
+  #ifdef CAPTURE_AND_GENERATE_DEVICE
+  	 SendString((unsigned char*)"\r\nStarting FDRM KL25 GENERATE FROM INPUT CAPTURE   \r\n", &deviceData);
+  #else
+  	 SendString((unsigned char*)"\r\nStarting FDRM KL25 GENERATE FROM CONSOLE COMMANDS   \r\n", &deviceData);
+  #endif
+  SendString((unsigned char*)"\r\n*******************************************************\r\n", &deviceData);
   initBufferCommnad();
 }
 

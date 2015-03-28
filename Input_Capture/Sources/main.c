@@ -48,8 +48,10 @@
 #include "RxBuf.h"
 #include "AS1.h"
 #include "Speed_Capture.h"
+#include "Direction_Capture.h"
+#include "Tacometer_Capture.h"
 #include "TU2.h"
-#include "Bit1.h"
+#include "CheckPoint.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -57,13 +59,20 @@
 #include "IO_Map.h"
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
+#include "General_Definitions.h"
 #include "DebugSerial.h"
+#include "Application.h"
 
 extern movementType movement;
 LDD_TDeviceData *SpeedCapture;
 LDD_TError ErrorSpeedCapture, FlagSpeedCapture;
 volatile uint32_t DataSpeedCapture;
 uint32_t DataSpeedCaptureOld;
+
+LDD_TDeviceData *DirectionCapture;
+LDD_TError ErrorDirectionCapture, FlagDirectionCapture;
+volatile uint32_t DataDirectionCapture;
+uint32_t DataDirectionCaptureOld;
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -73,13 +82,7 @@ int main(void)
   uint32_t dutySpeed_old=1000;
   uint32_t dutyDirection_old=1000;
   movement.direction=dutyDirection_old;
-  movement.speed=dutySpeed_old;
-  uint32_t counterSpeedCapture;
-  uint32_t dutySpeedCapture;
-  uint32_t periodSpeedCapture=50000;
-  uint32_t timeLowSpeed=0;
-  uint32_t timeHighSpeed=0;
-  uint32_t counterPrint=0;
+  movement.speed=dutySpeed_old;  
   
   char buffer[10];
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
@@ -95,49 +98,78 @@ int main(void)
 
   while (1)
   {
-	  //#define CAPTURE_AND_GENERATE_DEVICE 1
 	  #ifdef CAPTURE_AND_GENERATE_DEVICE
 		  if(FlagSpeedCapture == ERR_OK)
-		  {
+		  {			  
+			  movement.speed=Set_New_Speed();
 			  FlagSpeedCapture=1;
-			  Speed_Capture_GetCaptureValue(SpeedCapture, &DataSpeedCapture);		  
-			  if(DataSpeedCaptureOld>DataSpeedCapture)
-			  {
-				  counterSpeedCapture=(65535-DataSpeedCaptureOld)+DataSpeedCapture;
-			  }
-			  else
-			  {
-				  counterSpeedCapture=DataSpeedCapture-DataSpeedCaptureOld;
-			  }
-			  DataSpeedCaptureOld=DataSpeedCapture;
-			  /*TODO!: coger el nivel del pin para saber si estamos midiendo
-			   * el duty o la frecuencia
-			   */
-			  if(counterSpeedCapture < 25000) //duty never will be less that 50%
-			  {
-				  timeHighSpeed=counterSpeedCapture*1.53;			  
-				  LEDB_Neg(); 
-			  }
-			  else
-			  {
-				  timeLowSpeed=counterSpeedCapture*1.53;			  
-			  }
-			  if(counterPrint++==10)
-			  {
-				counterPrint=0;
-				debugString((unsigned char *)"TimeHigh ");			  
-				itoaDebug(timeHighSpeed,&buffer[0]);
-				debugStringRed((unsigned char *)buffer);
-				debugString((unsigned char *)"us.TimeLow ");			  
-				itoaDebug(timeLowSpeed,&buffer[0]);
-				debugStringRed((unsigned char *)buffer);
-				debugString((unsigned char *)"us.Total ");			  
-				itoaDebug(timeLowSpeed+timeHighSpeed,&buffer[0]);
-				debugStringRed((unsigned char *)buffer);
-				debugString((unsigned char *)"us\n\r");
-			  }
-			  movement.speed=timeHighSpeed;
-		  }		  	  
+		  }
+		  if(FlagDirectionCapture == ERR_OK)
+		  {
+			  movement.speed=Set_New_Speed();
+			  FlagDirectionCapture=1;
+		  }
+//		  		  {
+//		  			  FlagDirectionCapture=1;
+//		  			  Direction_Capture_GetCaptureValue(DirectionCapture, &DataDirectionCapture);		  
+//		  			  if(DataDirectionCaptureOld>DataDirectionCapture)
+//		  			  {
+//		  				  counterDirectionCapture=(65535-DataDirectionCaptureOld)+DataDirectionCapture;
+//		  			  }
+//		  			  else
+//		  			  {
+//		  				  counterDirectionCapture=DataDirectionCapture-DataDirectionCaptureOld;
+//		  			  }
+//		  			  DataDirectionCaptureOld=DataDirectionCapture;
+//		  			  /*TODO!: coger el nivel del pin para saber si estamos midiendo
+//		  			   * el duty o la frecuencia
+//		  			   */
+//		  			  if(counterDirectionCapture < 25000) //duty never will be less that 50%
+//		  			  {
+//		  				  timeHighDirection=counterDirectionCapture*1.53;			  
+//		  				  LEDB_Neg(); 
+//		  			  }
+//		  			  else
+//		  			  {
+//		  				  timeLowDirection=counterDirectionCapture*1.53;			  
+//		  			  }
+//		  			  if(counterPrint++==10)
+//		  			  {
+//		  				counterPrint=0;
+//		  				debugString((unsigned char *)"TimeHigh ");			  
+//		  				itoaDebug(timeHighDirection,&buffer[0]);
+//		  				debugStringRed((unsigned char *)buffer);
+//		  				debugString((unsigned char *)"us.TimeLow ");			  
+//		  				itoaDebug(timeLowDirection,&buffer[0]);
+//		  				debugStringRed((unsigned char *)buffer);
+//		  				debugString((unsigned char *)"us.Total ");			  
+//		  				itoaDebug(timeLowDirection+timeHighDirection,&buffer[0]);
+//		  				debugStringRed((unsigned char *)buffer);
+//		  				debugString((unsigned char *)"us\n\r");
+//		  			  }
+//		  			  movement.Direction=timeHighDirection;
+//		  		  }		  	  
+//		  		  if(movement.Direction!=dutyDirection_old)
+//		  		  {
+//		  			  dutyDirection_old=movement.Direction;
+//		  			  Direction_SetDutyUS(50000-dutyDirection_old);
+//		  			  
+//		  			  debugString((unsigned char *)"New duty Direction:");
+//		  			  itoaDebug(movement.Direction,&buffer[0]);
+//		  			  debugStringGreen((unsigned char *)buffer);
+//		  			  debugString((unsigned char *)"\n\r");
+//		  		  }
+//		  		  if(movement.direction!=dutyDirection_old)
+//		  		  {
+//		  			  dutyDirection_old=movement.direction;
+//		  			  Direction_SetDutyUS(50000-dutyDirection_old);
+//		  			  
+//		  			  debugString((unsigned char *)"New duty direction:");
+//		  			  itoaDebug(movement.direction,buffer);
+//		  			  debugStringRed((unsigned char *)buffer);
+//		  			  debugString((unsigned char *)"\n\r");
+//		  		  }
+//  	  	  }
 		  if(movement.speed!=dutySpeed_old)
 		  {
 			  dutySpeed_old=movement.speed;

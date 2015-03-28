@@ -7,7 +7,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-22, 14:30, # CodeGen: 23
+**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
 **     Abstract    :
 **
 **     Settings    :
@@ -78,8 +78,10 @@
 #include "RxBuf.h"
 #include "AS1.h"
 #include "Speed_Capture.h"
+#include "Direction_Capture.h"
+#include "Tacometer_Capture.h"
 #include "TU2.h"
-#include "Bit1.h"
+#include "CheckPoint.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -279,6 +281,8 @@ void PE_low_level_init(void)
   RxBuf_Init();
   /* ### Serial_LDD "AS1" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
   (void)AS1_Init(NULL);
+  /* ### Serial_LDD "CheckPoint" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
+  (void)CheckPoint_Init(NULL);
   __EI();
 }
   /* Flash configuration field */

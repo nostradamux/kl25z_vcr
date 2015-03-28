@@ -52,8 +52,10 @@
 #include "RxBuf.h"
 #include "AS1.h"
 #include "Speed_Capture.h"
+#include "Direction_Capture.h"
+#include "Tacometer_Capture.h"
 #include "TU2.h"
-#include "Bit1.h"
+#include "CheckPoint.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,6 +132,82 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr);
 */
 /* ===================================================================*/
 void Speed_Capture_OnCapture(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  CheckPoint_OnBlockReceived (module Events)
+**
+**     Component   :  CheckPoint [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called when the requested number of data is
+**         moved to the input buffer.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void CheckPoint_OnBlockReceived(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  CheckPoint_OnBlockSent (module Events)
+**
+**     Component   :  CheckPoint [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called after the last character from the
+**         output buffer is moved to the transmitter. 
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void CheckPoint_OnBlockSent(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  Tacometer_Capture_OnCapture (module Events)
+**
+**     Component   :  Tacometer_Capture [Capture_LDD]
+*/
+/*!
+**     @brief
+**         This event is called on capturing of counter actual value.
+**         Component and OnCapture event must be enabled. See
+**         [SetEventMask] and [GetEventMask] methods. This event is
+**         available only if a [Interrupt service/event] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void Tacometer_Capture_OnCapture(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  Direction_Capture_OnCapture (module Events)
+**
+**     Component   :  Direction_Capture [Capture_LDD]
+*/
+/*!
+**     @brief
+**         This event is called on capturing of counter actual value.
+**         Component and OnCapture event must be enabled. See
+**         [SetEventMask] and [GetEventMask] methods. This event is
+**         available only if a [Interrupt service/event] is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void Direction_Capture_OnCapture(LDD_TUserData *UserDataPtr);
 
 /* END Events */
 

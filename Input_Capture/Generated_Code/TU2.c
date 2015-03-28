@@ -6,7 +6,7 @@
 **     Component   : TimerUnit_LDD
 **     Version     : Component 01.164, Driver 01.11, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-22, 14:00, # CodeGen: 22
+**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
 **     Abstract    :
 **          This TimerUnit component provides a low level API for unified hardware access across
 **          various timer devices using the Prescaler-Counter-Compare-Capture timer structure.
@@ -22,12 +22,32 @@
 **          Counter restart                                : On-overrun
 **            Overrun period                               : 100 ms
 **            Interrupt                                    : Disabled
-**          Channel list                                   : 1
+**          Channel list                                   : 3
 **            Channel 0                                    : 
+**              Mode                                       : Capture
+**                Capture                                  : TPM0_C1V
+**                Capture input pin                        : ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1
+**                Capture input signal                     : Direction_Capture_Signal
+**                Edge                                     : both edges
+**                Maximum time of event                    : 100.000006144 ms
+**                Interrupt                                : Enabled
+**                  Interrupt                              : INT_TPM0
+**                  Interrupt priority                     : high priority
+**            Channel 1                                    : 
 **              Mode                                       : Capture
 **                Capture                                  : TPM0_C0V
 **                Capture input pin                        : ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0
-**                Capture input signal                     : 
+**                Capture input signal                     : Speed_Capture_Signal
+**                Edge                                     : both edges
+**                Maximum time of event                    : 100.000006144 ms
+**                Interrupt                                : Enabled
+**                  Interrupt                              : INT_TPM0
+**                  Interrupt priority                     : high priority
+**            Channel 2                                    : 
+**              Mode                                       : Capture
+**                Capture                                  : TPM0_C3V
+**                Capture input pin                        : PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI
+**                Capture input signal                     : Tacometer_Capture_Signal
 **                Edge                                     : both edges
 **                Maximum time of event                    : 100.000006144 ms
 **                Interrupt                                : Enabled
@@ -39,8 +59,8 @@
 **            Event mask                                   : 
 **              OnCounterRestart                           : Disabled
 **              OnChannel0                                 : Enabled
-**              OnChannel1                                 : Disabled
-**              OnChannel2                                 : Disabled
+**              OnChannel1                                 : Enabled
+**              OnChannel2                                 : Enabled
 **              OnChannel3                                 : Disabled
 **              OnChannel4                                 : Disabled
 **              OnChannel5                                 : Disabled
@@ -57,9 +77,9 @@
 **            Clock configuration 7                        : This component disabled
 **     Contents    :
 **         Init              - LDD_TDeviceData* TU2_Init(LDD_TUserData *UserDataPtr);
-**         Enable            - LDD_TError TU2_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         Disable           - LDD_TError TU2_Disable(LDD_TDeviceData *DeviceDataPtr);
-**         ResetCounter      - LDD_TError TU2_ResetCounter(LDD_TDeviceData *DeviceDataPtr);
+**         SetEventMask      - LDD_TError TU2_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask...
+**         GetEventMask      - LDD_TEventMask TU2_GetEventMask(LDD_TDeviceData *DeviceDataPtr);
+**         GetCounterValue   - TU2_TValueType TU2_GetCounterValue(LDD_TDeviceData *DeviceDataPtr);
 **         GetCaptureValue   - LDD_TError TU2_GetCaptureValue(LDD_TDeviceData *DeviceDataPtr, uint8_t...
 **         SelectCaptureEdge - LDD_TError TU2_SelectCaptureEdge(LDD_TDeviceData *DeviceDataPtr, uint8_t...
 **
@@ -108,7 +128,9 @@
 
 /* MODULE TU2. */
 
+#include "Direction_Capture.h"
 #include "Speed_Capture.h"
+#include "Tacometer_Capture.h"
 #include "TU2.h"
 /* {Default RTOS Adapter} No RTOS includes */
 #include "IO_Map.h"
@@ -118,15 +140,14 @@ extern "C" {
 #endif 
 
 /* List of channels used by component */
-static const uint8_t ChannelDevice[TU2_NUMBER_OF_CHANNELS] = {0x00U};
+static const uint8_t ChannelDevice[TU2_NUMBER_OF_CHANNELS] = {0x01U,0x00U,0x03U};
 
 /* Table of channels mode / 0 - compare mode, 1 - capture mode */
-static const uint8_t ChannelMode[TU2_NUMBER_OF_CHANNELS] = {0x01U};
+static const uint8_t ChannelMode[TU2_NUMBER_OF_CHANNELS] = {0x01U,0x01U,0x01U};
 
 
 typedef struct {
   LDD_TEventMask EnEvents;             /* Enable/Disable events mask */
-  uint32_t Source;                     /* Current source clock */
   uint8_t InitCntr;                    /* Number of initialization */
   LDD_TUserData *UserDataPtr;          /* RTOS device data structure */
 } TU2_TDeviceData;
@@ -138,9 +159,9 @@ static TU2_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 /* {Default RTOS Adapter} Global variable used for passing a parameter into ISR */
 static TU2_TDeviceDataPtr INT_TPM0__DEFAULT_RTOS_ISRPARAM;
 
-#define AVAILABLE_EVENTS_MASK (LDD_TEventMask)(LDD_TIMERUNIT_ON_CHANNEL_0)
-#define AVAILABLE_PIN_MASK (LDD_TPinMask)(TU2_CHANNEL_0_PIN)
-#define LAST_CHANNEL 0x00U
+#define AVAILABLE_EVENTS_MASK (LDD_TEventMask)(LDD_TIMERUNIT_ON_CHANNEL_0 | LDD_TIMERUNIT_ON_CHANNEL_1 | LDD_TIMERUNIT_ON_CHANNEL_2)
+#define AVAILABLE_PIN_MASK (LDD_TPinMask)(TU2_CHANNEL_0_PIN | TU2_CHANNEL_1_PIN | TU2_CHANNEL_2_PIN)
+#define LAST_CHANNEL 0x02U
 
 /* Internal method prototypes */
 /*
@@ -208,8 +229,19 @@ LDD_TDeviceData* TU2_Init(LDD_TUserData *UserDataPtr)
   TPM0_C5SC = 0x00U;                   /* Clear channel status and control register */
   /* TPM0_MOD: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,MOD=0xFFFF */
   TPM0_MOD = TPM_MOD_MOD(0xFFFF);      /* Set up modulo register */
+  /* TPM0_C1SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=1,MSB=0,MSA=0,ELSB=1,ELSA=1,??=0,DMA=0 */
+  TPM0_C1SC = (TPM_CnSC_CHIE_MASK | TPM_CnSC_ELSB_MASK | TPM_CnSC_ELSA_MASK); /* Set up channel status and control register */
   /* TPM0_C0SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=1,MSB=0,MSA=0,ELSB=1,ELSA=1,??=0,DMA=0 */
   TPM0_C0SC = (TPM_CnSC_CHIE_MASK | TPM_CnSC_ELSB_MASK | TPM_CnSC_ELSA_MASK); /* Set up channel status and control register */
+  /* TPM0_C3SC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CHF=0,CHIE=1,MSB=0,MSA=0,ELSB=1,ELSA=1,??=0,DMA=0 */
+  TPM0_C3SC = (TPM_CnSC_CHIE_MASK | TPM_CnSC_ELSB_MASK | TPM_CnSC_ELSA_MASK); /* Set up channel status and control register */
+  /* PORTC_PCR2: ISF=0,MUX=4 */
+  PORTC_PCR2 = (uint32_t)((PORTC_PCR2 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x03)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x04)
+               ));
   /* PORTC_PCR1: ISF=0,MUX=4 */
   PORTC_PCR1 = (uint32_t)((PORTC_PCR1 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
@@ -217,8 +249,14 @@ LDD_TDeviceData* TU2_Init(LDD_TUserData *UserDataPtr)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x04)
                ));
-  DeviceDataPrv->EnEvents = 0x01U;     /* Enable selected events */
-  DeviceDataPrv->Source = TPM_PDD_SYSTEM; /* Store clock source */
+  /* PORTD_PCR3: ISF=0,MUX=4 */
+  PORTD_PCR3 = (uint32_t)((PORTD_PCR3 & (uint32_t)~(uint32_t)(
+                PORT_PCR_ISF_MASK |
+                PORT_PCR_MUX(0x03)
+               )) | (uint32_t)(
+                PORT_PCR_MUX(0x04)
+               ));
+  DeviceDataPrv->EnEvents = 0x07U;     /* Enable selected events */
   /* NVIC_IPR4: PRI_17=0x40 */
   NVIC_IPR4 = (uint32_t)((NVIC_IPR4 & (uint32_t)~(uint32_t)(
                NVIC_IP_PRI_17(0xBF)
@@ -236,83 +274,115 @@ LDD_TDeviceData* TU2_Init(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Method      :  TU2_Enable (component TimerUnit_LDD)
+**     Method      :  TU2_SetEventMask (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Enables the component - it starts the signal generation.
-**         Events may be generated (see SetEventMask). The method is
-**         not available if the counter can't be disabled/enabled by HW.
+**         Enables/disables event(s). The events contained within the
+**         mask are enabled. Events not contained within the mask are
+**         disabled. The component event masks are defined in the
+**         PE_Types.h file. Note: Event that are not generated (See the
+**         "Events" tab in the Component inspector) are not handled by
+**         this method. In this case the method returns ERR_PARAM_MASK
+**         error code. See also method [GetEventMask].
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
+**     @param
+**         EventMask       - Event mask
 **     @return
 **                         - Error code, possible codes:
 **                           ERR_OK - OK
 **                           ERR_SPEED - The component does not work in
 **                           the active clock configuration
+**                           ERR_PARAM_MASK - Event mask is not valid
 */
 /* ===================================================================*/
-LDD_TError TU2_Enable(LDD_TDeviceData *DeviceDataPtr)
+LDD_TError TU2_SetEventMask(LDD_TDeviceData *DeviceDataPtr, LDD_TEventMask EventMask)
 {
   TU2_TDeviceData *DeviceDataPrv = (TU2_TDeviceData *)DeviceDataPtr;
 
-  TPM_PDD_SelectPrescalerSource(TPM0_BASE_PTR, DeviceDataPrv->Source); /* Enable the device */
+  /* Event mask test - this test can be disabled by setting the "Ignore range checking"
+     property to the "yes" value in the "Configuration inspector" */
+  if ((EventMask & ((LDD_TEventMask)~AVAILABLE_EVENTS_MASK)) != 0U) {
+    return ERR_PARAM_MASK;
+  }
+  /* {Default RTOS Adapter} Critical section begin, general PE function is used */
+  EnterCritical();
+  if ((EventMask & LDD_TIMERUNIT_ON_CHANNEL_0) != 0U) { /* Is the event enabled? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[0]); /* If yes then clear flag */
+    TPM_PDD_EnableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[0]); /* and enable interrupt */
+  }
+  else {
+    TPM_PDD_DisableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[0]); /* Disable channel 0 interrupt */
+  }
+  if ((EventMask & LDD_TIMERUNIT_ON_CHANNEL_1) != 0U) { /* Is the event enabled? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[1]); /* If yes then clear flag */
+    TPM_PDD_EnableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[1]); /* and enable interrupt */
+  }
+  else {
+    TPM_PDD_DisableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[1]); /* Disable channel 1 interrupt */
+  }
+  if ((EventMask & LDD_TIMERUNIT_ON_CHANNEL_2) != 0U) { /* Is the event enabled? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[2]); /* If yes then clear flag */
+    TPM_PDD_EnableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[2]); /* and enable interrupt */
+  }
+  else {
+    TPM_PDD_DisableChannelInterrupt(TPM0_BASE_PTR, ChannelDevice[2]); /* Disable channel 2 interrupt */
+  }
+  DeviceDataPrv->EnEvents = EventMask;
+  /* {Default RTOS Adapter} Critical section end, general PE function is used */
+  ExitCritical();
   return ERR_OK;
 }
 
 /*
 ** ===================================================================
-**     Method      :  TU2_Disable (component TimerUnit_LDD)
+**     Method      :  TU2_GetEventMask (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Disables the component - it stops signal generation and
-**         events calling. The method is not available if the counter
-**         can't be disabled/enabled by HW.
+**         Returns current events mask. Note: Event that are not
+**         generated (See the "Events" tab in the Component inspector)
+**         are not handled by this method. See also method
+**         [SetEventMask].
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_SPEED - The component does not work in
-**                           the active clock configuration
+**                         - Current EventMask.
+**                           The component event masks are defined in
+**                           the PE_Types.h file.
 */
 /* ===================================================================*/
-LDD_TError TU2_Disable(LDD_TDeviceData *DeviceDataPtr)
+LDD_TEventMask TU2_GetEventMask(LDD_TDeviceData *DeviceDataPtr)
 {
-  (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
-  TPM_PDD_SelectPrescalerSource(TPM0_BASE_PTR, TPM_PDD_DISABLED);
-  return ERR_OK;
+  TU2_TDeviceData *DeviceDataPrv = (TU2_TDeviceData *)DeviceDataPtr;
+
+  return DeviceDataPrv->EnEvents;
 }
 
 /*
 ** ===================================================================
-**     Method      :  TU2_ResetCounter (component TimerUnit_LDD)
+**     Method      :  TU2_GetCounterValue (component TimerUnit_LDD)
 */
 /*!
 **     @brief
-**         Resets counter. If counter is counting up then it is set to
-**         zero. If counter is counting down then counter is updated to
-**         the reload value.
-**         The method is not available if HW doesn't allow resetting of
+**         Returns the content of counter register. This method can be
+**         used both if counter is enabled and if counter is disabled.
+**         The method is not available if HW doesn't allow reading of
 **         the counter.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by [Init] method.
 **     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK 
-**                           ERR_SPEED - The component does not work in
-**                           the active clock configuration
+**                         - Counter value (number of counted ticks).
 */
 /* ===================================================================*/
-LDD_TError TU2_ResetCounter(LDD_TDeviceData *DeviceDataPtr)
+TU2_TValueType TU2_GetCounterValue(LDD_TDeviceData *DeviceDataPtr)
 {
   (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
-  TPM_PDD_InitializeCounter(TPM0_BASE_PTR);
-  return ERR_OK;                       /* OK */
+  return (TU2_TValueType)TPM_PDD_ReadCounterReg(TPM0_BASE_PTR);
 }
 
 /*
@@ -437,10 +507,24 @@ PE_ISR(TU2_Interrupt)
   if ((TPM_PDD_GetChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[0])) != 0U) { /* Is the channel interrupt flag pending? */
     State |= LDD_TIMERUNIT_ON_CHANNEL_0; /* and set mask */
   }
+  if ((TPM_PDD_GetChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[1])) != 0U) { /* Is the channel interrupt flag pending? */
+    State |= LDD_TIMERUNIT_ON_CHANNEL_1; /* and set mask */
+  }
+  if ((TPM_PDD_GetChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[2])) != 0U) { /* Is the channel interrupt flag pending? */
+    State |= LDD_TIMERUNIT_ON_CHANNEL_2; /* and set mask */
+  }
   State &= DeviceDataPrv->EnEvents;    /* Handle only enabled interrupts */
   if (State & LDD_TIMERUNIT_ON_CHANNEL_0) { /* Is the channel 0 interrupt flag pending? */
     TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[0]); /* Clear flag */
     TU2_OnChannel0(DeviceDataPrv->UserDataPtr); /* Invoke OnChannel0 event */
+  }
+  if (State & LDD_TIMERUNIT_ON_CHANNEL_1) { /* Is the channel 0 interrupt flag pending? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[1]); /* Clear flag */
+    TU2_OnChannel1(DeviceDataPrv->UserDataPtr); /* Invoke OnChannel1 event */
+  }
+  if (State & LDD_TIMERUNIT_ON_CHANNEL_2) { /* Is the channel 0 interrupt flag pending? */
+    TPM_PDD_ClearChannelInterruptFlag(TPM0_BASE_PTR, ChannelDevice[2]); /* Clear flag */
+    TU2_OnChannel2(DeviceDataPrv->UserDataPtr); /* Invoke OnChannel2 event */
   }
 }
 

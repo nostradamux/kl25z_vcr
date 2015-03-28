@@ -6,7 +6,7 @@
 **     Component   : Capture_LDD
 **     Version     : Component 01.010, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-22, 14:00, # CodeGen: 22
+**     Date/Time   : 2015-03-28, 10:35, # CodeGen: 31
 **     Abstract    :
 **          This component "Capture_LDD" simply implements the capture function
 **          of timer. The counter counts the same way as in free run mode. On
@@ -28,7 +28,7 @@
 **            Interrupt priority                           : high priority
 **          Event                                          : 
 **            Input pin                                    : ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0
-**            Input pin signal                             : 
+**            Input pin signal                             : Speed_Capture_Signal
 **            Edge                                         : both edges
 **            Maximum time of event                        : 100 ms
 **          Initialization                                 : 
@@ -285,7 +285,7 @@ LDD_TError Speed_Capture_SelectCaptureEdge(LDD_TDeviceData *DeviceDataPtr, LDD_T
 
 /*
 ** ===================================================================
-**     Method      :  Speed_Capture_TU2_OnChannel0 (component Capture_LDD)
+**     Method      :  Speed_Capture_TU2_OnChannel1 (component Capture_LDD)
 **
 **     Description :
 **         The method services the event of the linked component TU2 and 
@@ -293,7 +293,7 @@ LDD_TError Speed_Capture_SelectCaptureEdge(LDD_TDeviceData *DeviceDataPtr, LDD_T
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
 */
-void TU2_OnChannel0(LDD_TUserData *UserDataPtr);
+void TU2_OnChannel1(LDD_TUserData *UserDataPtr);
 
 /* END Speed_Capture. */
 

@@ -10,6 +10,7 @@
 
 #include "PE_Types.h"
 #include "PE_LDD.h"
+#include "General_Definitions.h"
 
 #define SPEED_COMMAND_START 	'S'
 #define SPEED_COMMAND_STOP 		's'

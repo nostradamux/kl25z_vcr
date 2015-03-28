@@ -135,32 +135,77 @@ Module "Speed_Capture" (component Capture_LDD)
                 event (even if the returned Error code is ERR_OK).
    - Speed_Capture_SelectCaptureEdge -Sets the type of edge for input capture.
 
+Module "Direction_Capture" (component Capture_LDD)
+   - Direction_Capture_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt 
+                vectors and sets interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. 
+                code"> is set to "yes" value then the device is also enabled (see the description of the <Enable> method). In 
+                this case the <Enable> method is not necessary and needn't to be generated. This method can be called only once.
+                Before the second call of Init the <Deinit> must be called first.
+   - Direction_Capture_Enable -Enables the component - the external events are counted.
+   - Direction_Capture_Disable -Disables the component - the external events are not counted.
+   - Direction_Capture_Reset -This method resets the counter register (see implementation note in <General Info>).
+   - Direction_Capture_GetCaptureValue -This method gets the last value captured by enabled timer (see implementation note in 
+                <General Info>). The method does not return valid value after initialization or after <Reset> until new capture 
+                event (even if the returned Error code is ERR_OK).
+   - Direction_Capture_SelectCaptureEdge -Sets the type of edge for input capture.
+
+Module "Tacometer_Capture" (component Capture_LDD)
+   - Tacometer_Capture_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt 
+                vectors and sets interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. 
+                code"> is set to "yes" value then the device is also enabled (see the description of the <Enable> method). In 
+                this case the <Enable> method is not necessary and needn't to be generated. This method can be called only once.
+                Before the second call of Init the <Deinit> must be called first.
+   - Tacometer_Capture_Enable -Enables the component - the external events are counted.
+   - Tacometer_Capture_Disable -Disables the component - the external events are not counted.
+   - Tacometer_Capture_Reset -This method resets the counter register (see implementation note in <General Info>).
+   - Tacometer_Capture_GetCaptureValue -This method gets the last value captured by enabled timer (see implementation note in 
+                <General Info>). The method does not return valid value after initialization or after <Reset> until new capture 
+                event (even if the returned Error code is ERR_OK).
+   - Tacometer_Capture_SelectCaptureEdge -Sets the type of edge for input capture.
+
 Module "TU2"       (component TimerUnit_LDD)
    - TU2_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and sets 
                 interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. code"> is set to 
                 "yes" value then the device is also enabled (see the description of the <Enable> method). In this case the 
                 <Enable> method is not necessary and needn't to be generated. This method can be called only once. Before the 
                 second call of Init the <Deinit> must be called first.
-   - TU2_Enable -Enables the component - it starts the signal generation. Events may be generated (see SetEventMask). The 
-                method is not available if the counter can't be disabled/enabled by HW.
-   - TU2_Disable -Disables the component - it stops signal generation and events calling. The method is not available if the 
-                counter can't be disabled/enabled by HW.
-   - TU2_ResetCounter -Resets counter. If counter is counting up then it is set to zero. If counter is counting down then 
-                counter is updated to the reload value.   The method is not available if HW doesn't allow resetting of the 
-                counter.
+   - TU2_SetEventMask -Enables/disables event(s). The events contained within the mask are enabled. Events not contained within 
+                the mask are disabled. The component event masks are defined in the PE_Types.h file. Note: Event that are not 
+                generated (See the "Events" tab in the Component inspector) are not handled by this method. In this case the 
+                method returns ERR_PARAM_MASK error code. See also method <GetEventMask>.
+   - TU2_GetEventMask -Returns current events mask. Note: Event that are not generated (See the "Events" tab in the Component 
+                inspector) are not handled by this method. See also method <SetEventMask>.
+   - TU2_GetCounterValue -Returns the content of counter register. This method can be used both if counter is enabled and if 
+                counter is disabled. The method is not available if HW doesn't allow reading of the counter.
    - TU2_GetCaptureValue -Returns the content of capture register specified by the parameter ChannelIdx. This method is 
                 available when at least one channel is configured.
    - TU2_SelectCaptureEdge -Sets the type of edge for input capture on selected channel input. This method is available when at 
                 least one channel is configured.
 
-Module "Bit1"      (component BitIO_LDD)
-   - Bit1_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and sets 
-                interrupt priority, sets pin routing, sets timing, etc. If the "Enable in init. code" is set to "yes" value 
-                then the device is also enabled(see the description of the Enable() method). In this case the Enable() method 
-                is not necessary and needn't to be generated.
-   - Bit1_GetVal -Returns the input/output value. If the direction is [input] then the input value of the pin is read and 
-                returned. If the direction is [output] then the last written value is read and returned (see <Safe mode> 
-                property for limitations). This method cannot be disabled if direction is [input].
+Module "CheckPoint" (component FRDM_KL25Z_UART)
+   - CheckPoint_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt vectors and 
+                sets interrupt priority, sets pin routing, sets timing, etc. If the "Enable in init. code" is set to "yes" 
+                value then the device is also enabled(see the description of the Enable() method). In this case the Enable() 
+                method is not necessary and needn't to be generated.
+   - CheckPoint_Deinit -Deinitializes the device. Switches off the device, frees the device data structure memory, interrupts 
+                vectors, etc.
+   - CheckPoint_SendBlock -Sends a block of characters. The method returns ERR_BUSY when the previous block transmission is not 
+                completed. Method <CancelBlockTransmission> can be used to cancel a transmit operation. This method is 
+                available only if the transmitter property is enabled. This method finishes immediately after calling it - it 
+                doesn't wait the end of data transmission. Use event <OnBlockSent> to check the end of data transmission.
+   - CheckPoint_ReceiveBlock -Specifies the number of data to receive. The method returns ERR_BUSY until the specified number 
+                of characters is received. Method <CancelBlockReception> can be used to cancel a running receive operation. If 
+                a receive operation is not in progress (the method was not called or a previous operation has already finished) 
+                all received characters will be lost without any notification. To prevent the loss of data call the method 
+                immediately after the last receive operation has finished (e.g. from the <OnBlockReceived> event). This method 
+                finishes immediately after calling it - it doesn't wait the end of data reception. Use event <OnBlockReceived> 
+                to check the end of data reception.
+   - CheckPoint_GetSentDataNum -Returns the number of sent characters.
+   - CheckPoint_GetReceivedDataNum -Returns the number of received characters in the receive buffer.
+   - CheckPoint_GetTxCompleteStatus -Returns whether the transmitter has transmitted all characters and there are no other 
+                characters in the transmitter's HW FIFO or the shift register. The status flag is accumulated, after calling 
+                this method the status is returned and cleared (set to "false" state). This method is available only if a 
+                peripheral supports this feature.
 
 Module "Cpu"       (component MKL25Z128LK4)
 

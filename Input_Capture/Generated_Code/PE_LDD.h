@@ -5,7 +5,7 @@
 **     Processor   : MKL25Z128VLK4
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-22, 14:30, # CodeGen: 23
+**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
 **     Abstract    :
 **
 **     Settings    :
@@ -78,8 +78,10 @@
 #include "RxBuf.h"
 #include "AS1.h"
 #include "Speed_Capture.h"
+#include "Direction_Capture.h"
+#include "Tacometer_Capture.h"
 #include "TU2.h"
-#include "Bit1.h"
+#include "CheckPoint.h"
 
 
 /*
