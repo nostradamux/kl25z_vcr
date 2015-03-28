@@ -35,6 +35,11 @@
 - \subpage PwmLdd1
 - \subpage PwmLdd2
 - \subpage AS1
+- \subpage TU2
+- \subpage Speed_Capture
+- \subpage Direction_Capture
+- \subpage Tacometer_Capture
+- \subpage CheckPoint
 
 
 */
