@@ -46,19 +46,22 @@ uint32_t Set_New_Speed()
 	  {
 		  timeLowSpeed=counterSpeedCapture*1.53;			  
 	  }
-	  if(counterPrint++==10)
-	  {
-		counterPrint=0;
-		debugString((unsigned char *)"TimeHigh ");			  
-		itoaDebug(timeHighSpeed,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us.TimeLow ");			  
-		itoaDebug(timeLowSpeed,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us.Total ");			  
-		itoaDebug(timeLowSpeed+timeHighSpeed,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us\n\r");
+	  if(debuggingActivated)
+	  {	  
+		  if(counterPrint++==20)
+	  	  {
+			counterPrint=0;
+			Debug_String((unsigned char *)"Speed TimeHigh ");			  
+			Itoa_Debug(timeHighSpeed,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us.TimeLow ");			  
+			Itoa_Debug(timeLowSpeed,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us.Total ");			  
+			Itoa_Debug(timeLowSpeed+timeHighSpeed,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us\n\r");
+		  }
 	  }
 	  return timeHighSpeed;
  }
@@ -95,19 +98,34 @@ uint32_t Set_New_Direction()
 	  {
 		  timeLowDirection=counterDirectionCapture*1.53;			  
 	  }
-	  if(counterPrint++==10)
-	  {
-		counterPrint=0;
-		debugString((unsigned char *)"TimeHigh ");			  
-		itoaDebug(timeHighDirection,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us.TimeLow ");			  
-		itoaDebug(timeLowDirection,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us.Total ");			  
-		itoaDebug(timeLowDirection+timeHighDirection,&buffer[0]);
-		debugStringRed((unsigned char *)buffer);
-		debugString((unsigned char *)"us\n\r");
+	  if(debuggingActivated)
+	  {	  
+	 	  if(counterPrint++==20)
+		  {
+			counterPrint=0;
+			Debug_String((unsigned char *)"Direction TimeHigh ");			  
+			Itoa_Debug(timeHighDirection,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us.TimeLow ");			  
+			Itoa_Debug(timeLowDirection,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us.Total ");			  
+			Itoa_Debug(timeLowDirection+timeHighDirection,&buffer[0]);
+			Debug_String_Red((unsigned char *)buffer);
+			Debug_String((unsigned char *)"us\n\r");
+		  }
 	  }
 	  return timeHighDirection;
- }		 
+ }	
+
+void Apply_Correction_Duty(int32 *valueToCorrect, int32 correction)
+{
+	if ((*valueToCorrect+correction)>0)
+	{
+		*valueToCorrect+=correction;
+	}
+	else
+	{
+		*valueToCorrect=0;
+	}
+}

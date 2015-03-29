@@ -14,9 +14,9 @@ static uint8 bufferCommand[SIZE_BUFFER_COMMAND];
 static uint8 indexCommand=0;
 static uint8 commandInterpreted=WAIT_COMMAND;
 
-movementType movement={-1,-1};
+movementType movement={1000,1000,0,0};
 
-void printHex(unsigned char data)
+void Print_Hex(unsigned char data)
 {
 	uint8_t dataHex[2];
 	
@@ -39,13 +39,13 @@ void printHex(unsigned char data)
 	{
 		dataHex[1]=(unsigned char)(55+dataHex[1]);
 	}
-	debugChar('0');
-	debugChar('x');
-	debugChar(dataHex[1]);
-	debugChar(dataHex[0]);
+	Debug_Char('0');
+	Debug_Char('x');
+	Debug_Char(dataHex[1]);
+	Debug_Char(dataHex[0]);
 }
 
-int myAtoi(char *str)
+int My_Atoi(char *str)
 {
     int res = 0;  // Initialize result
     int sign = 1;  // Initialize sign as positive
@@ -66,7 +66,7 @@ int myAtoi(char *str)
     return sign*res;
 }
 
-char* itoaDebug(int i, char b[]){
+char* Itoa_Debug(int i, char b[]){
     char const digit[] = "0123456789";
     char* p = b;
     if(i<0){
@@ -85,50 +85,50 @@ char* itoaDebug(int i, char b[]){
     }while(i);
     return b;
 }
-void debugStringGreen(const unsigned char *str)
+void Debug_String_Green(const unsigned char *str)
 {
-	SendString((unsigned char*)ANSI_COLOR_GREEN, &deviceData);
-	SendString(str, &deviceData);
-	SendString((unsigned char*)ANSI_COLOR_NO, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_GREEN, &deviceData);
+	Send_String(str, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_NO, &deviceData);
 }
 
-void debugStringRed(const unsigned char *str)
+void Debug_String_Red(const unsigned char *str)
 {
-	SendString((unsigned char*)ANSI_COLOR_RED, &deviceData);
-	SendString(str, &deviceData);
-	SendString((unsigned char*)ANSI_COLOR_NO, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_RED, &deviceData);
+	Send_String(str, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_NO, &deviceData);
 }
 
-void debugStringYellow(const unsigned char *str)
+void Debug_String_Yellow(const unsigned char *str)
 {
-	SendString((unsigned char*)ANSI_COLOR_YELLOW, &deviceData);
-	SendString(str, &deviceData);
-	SendString((unsigned char*)ANSI_COLOR_NO, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_YELLOW, &deviceData);
+	Send_String(str, &deviceData);
+	Send_String((unsigned char*)ANSI_COLOR_NO, &deviceData);
 }
 
-void debugString(const unsigned char *str)
+void Debug_String(const unsigned char *str)
 {
-	SendString(str, &deviceData);
+	Send_String(str, &deviceData);
 }
 
-void debugChar(const unsigned char data)
+void Debug_Char(const unsigned char data)
 {
-	SendChar(data, &deviceData);
+	Send_Char(data, &deviceData);
 }
 
-void SendChar(unsigned char ch, UART_Desc *desc) {
+void Send_Char(unsigned char ch, UART_Desc *desc) {
   desc->isSent = FALSE;  /* this will be set to 1 once the block has been sent */
   while(AS1_SendBlock(desc->handle, (LDD_TData*)&ch, 1)!=ERR_OK) {} /* Send char */
   while(!desc->isSent) {} /* wait until we get the green flag from the TX interrupt */
 }
  
-void SendString(const unsigned char *str,  UART_Desc *desc) {
+void Send_String(const unsigned char *str,  UART_Desc *desc) {
   while(*str!='\0') {
-    SendChar(*str++, desc);
+    Send_Char(*str++, desc);
   }
 }
  
-void InitSerial(void) {
+void Init_Serial(void) {
   /* initialize struct fields */
   deviceData.handle = AS1_Init(&deviceData);
   deviceData.isSent = FALSE;
@@ -140,21 +140,30 @@ void InitSerial(void) {
   while(AS1_ReceiveBlock(deviceData.handle, (LDD_TData *)&deviceData.rxChar, sizeof(deviceData.rxChar))!=ERR_OK) {} /* initial kick off for receiving data */
 }
  
-void startSerial()
+void Start_Serial()
 {
-  InitSerial();
-  SendString((unsigned char*)VERSION, &deviceData);
-  SendString((unsigned char*)"\r\n*******************************************************\r\n", &deviceData);
-  #ifdef CAPTURE_AND_GENERATE_DEVICE
-  	 SendString((unsigned char*)"\r\nStarting FDRM KL25 GENERATE FROM INPUT CAPTURE   \r\n", &deviceData);
-  #else
-  	 SendString((unsigned char*)"\r\nStarting FDRM KL25 GENERATE FROM CONSOLE COMMANDS   \r\n", &deviceData);
-  #endif
-  SendString((unsigned char*)"\r\n*******************************************************\r\n", &deviceData);
-  initBufferCommnad();
+	Init_Serial();
+	
+	Debug_String_Yellow((unsigned char*)"\r\n*******************************************************\r\n");
+	Debug_String_Yellow((unsigned char*)"                     ");
+	Debug_String_Yellow((unsigned char*)VERSION);
+	#ifdef CAPTURE_AND_GENERATE_DEVICE
+		Debug_String_Yellow((unsigned char*)"\r\n     Starting FDRM KL25 GENERATE FROM INPUT CAPTURE   \r\n");
+	#else
+		Debug_String_Yellow((unsigned char*)"\r\n     Starting FDRM KL25 GENERATE FROM CONSOLE COMMANDS   \r\n");
+	#endif
+		Debug_String_Yellow((unsigned char*)"\r\n*******************************************************\r\n");
+	
+	#ifdef CAPTURE_AND_GENERATE_DEVICE
+		Debug_String((unsigned char*)"\r\nWrite Sxxxs (xxx=number) to correct Speed (us Duty). \r\nWrite Dxxxd (xxx=number) to correct Direction (us Duty) \r\n");
+		Debug_String((unsigned char*)"Activate/Deactivate Debugging info pressing 'I' or 'i'. \r\nBy default is deactivated \r\n\r\n\r\n");
+	#else
+		Debug_String((unsigned char*)"\r\nWrite Sxxxs (xxx=number) to change Speed (us Duty). \r\nWrite Dxxxd (xxx=number) to change Direction (us Duty) \r\n\r\n\r\n");
+	#endif
+	 initBufferCommnad();
 }
 
-void getDebugString()
+void Get_Debug_String()
 {
 	if (RxBuf_NofElements()!=0) 
 	{
@@ -163,12 +172,10 @@ void getDebugString()
 		{
 			unsigned char ch;			
 			(void)RxBuf_Get(&ch);
-			//SendChar(ch, &deviceData);
 		}
-		//SendString((unsigned char*)"\r\n", &deviceData);
 	}
 }
-uint8 isNumber(uint8 ch) 
+uint8 Is_Number(uint8 ch) 
 {
 	return ((ch>47)&&(ch<58));
 }
@@ -184,31 +191,44 @@ void initBufferCommnad()
 	commandInterpreted=WAIT_COMMAND;
 }
 
-void interpretComment()
+void Interpret_Command()
 {
 	switch(commandInterpreted)
 	{			
-			case(STOP_DIRECTION):
-					debugString((unsigned char*)"\r\nDirection received:");
-					debugStringRed(bufferCommand);
-					movement.direction=myAtoi((char*)bufferCommand);
+			#ifdef CAPTURE_AND_GENERATE_DEVICE
+				case(CORRECTION_STOP_DIRECTION):
+					Debug_String((unsigned char*)"\r\nDirection correction:");
+					Debug_String_Red(bufferCommand);
+					movement.correctionDirection=My_Atoi((char*)bufferCommand);
 					break;
-			case(STOP_SPEED):
-					debugString((unsigned char*)"\r\nSpeed received:");
-					debugStringGreen(bufferCommand);
-					movement.speed=myAtoi((char*)bufferCommand);
+				case(CORRECTION_STOP_SPEED):
+					Debug_String((unsigned char*)"\r\nSpeed correction:");
+					Debug_String_Green(bufferCommand);
+					movement.correctionSpeed=My_Atoi((char*)bufferCommand);
+					break;							
+			#else
+				case(STOP_DIRECTION):
+					Debug_String((unsigned char*)"\r\nDirection received:");
+					Debug_String_Red(bufferCommand);
+					movement.direction=My_Atoi((char*)bufferCommand);
 					break;
-			//case(STOP_SPEED):
+				case(STOP_SPEED):
+					Debug_String((unsigned char*)"\r\nSpeed received:");
+					Debug_String_Green(bufferCommand);
+					movement.speed=My_Atoi((char*)bufferCommand);
+					break;
+			#endif
 			default:
-					debugString((unsigned char*)"\r\nWrong Command!");
+					Debug_String((unsigned char*)"\r\nWrong Command!");
 					break;
 	}
-	debugString((unsigned char*)"\r\n");
+	Debug_String((unsigned char*)"\r\n");
 	indexCommand=0;
 	initBufferCommnad();
 }
 
-void getCommandReceived()
+#ifdef CAPTURE_AND_GENERATE_DEVICE
+void Get_Command_Received()
 {
 	if (RxBuf_NofElements()!=0) 
 	{
@@ -219,7 +239,105 @@ void getCommandReceived()
 			if(ch==13)//Retorno de carro (CR)
 			{
 				initBufferCommnad();				
-				debugString((unsigned char*)"\r\n");
+				Debug_String((unsigned char*)"\r\n");
+			}
+			else if ((ch=='I')||(ch=='i'))
+			{
+				if(debuggingActivated)
+				{
+					debuggingActivated=FALSE;
+					Send_String((unsigned char*)"\n\rDebugging deactivated\n\r", &deviceData);
+				}
+				else
+				{
+					debuggingActivated=TRUE;
+					Send_String((unsigned char*)"\n\rDebugging activated\n\r", &deviceData);
+				}
+			}
+			else
+			{				
+				if(commandInterpreted==WAIT_COMMAND)
+				{
+					if (ch==CORRECTION_SPEED_COMMAND_START)
+					{
+						commandInterpreted=CORRECTION_START_SPEED;
+						indexCommand=0;
+					}
+					if (ch==CORRECTION_DIRECTION_COMMAND_START)
+					{
+						commandInterpreted=CORRECTION_START_DIRECTION;
+						indexCommand=0;
+					}
+				}
+				else if((commandInterpreted==CORRECTION_START_DIRECTION)||(commandInterpreted==CORRECTION_START_SPEED))
+				{
+					if (ch==CORRECTION_SPEED_COMMAND_START)
+					{
+						commandInterpreted=CORRECTION_START_SPEED;
+						initBufferCommnad();
+					}
+					else if (ch==CORRECTION_DIRECTION_COMMAND_START)
+					{
+						commandInterpreted=CORRECTION_START_DIRECTION;					
+						initBufferCommnad();
+					}
+					else if (ch=='-')
+					{
+						bufferCommand[indexCommand]=ch;
+						indexCommand++;
+					}
+					else if (Is_Number(ch))
+					{
+						bufferCommand[indexCommand]=ch;
+						indexCommand++;
+					}
+					else if (ch==CORRECTION_SPEED_COMMAND_STOP)
+					{
+						if(indexCommand>0)
+						{
+							commandInterpreted=CORRECTION_STOP_SPEED;
+						}
+						else
+						{
+							commandInterpreted=WAIT_COMMAND;
+						}
+						Interpret_Command();
+					}
+					else if (ch==CORRECTION_DIRECTION_COMMAND_STOP)
+					{
+						if(indexCommand>0)
+						{
+							commandInterpreted=CORRECTION_STOP_DIRECTION;
+						}
+						else
+						{
+							commandInterpreted=WAIT_COMMAND;
+						}						
+						Interpret_Command();
+					}
+					else
+					{
+						commandInterpreted=WAIT_COMMAND;
+						Interpret_Command();
+					}
+				}
+			}//No CR received
+		}		
+	}
+}
+#else
+void Get_Command_Received()
+{
+	if (RxBuf_NofElements()!=0) 
+	{
+		unsigned char ch;			
+		while (RxBuf_NofElements()!=0)
+		{
+			(void)RxBuf_Get(&ch);			
+			if(ch==13)//Retorno de carro (CR)
+			{
+				initBufferCommnad();				
+				Debug_String((unsigned char*)"\r\n");
 			}
 			else
 			{
@@ -248,7 +366,7 @@ void getCommandReceived()
 						commandInterpreted=START_DIRECTION;					
 						initBufferCommnad();
 					}
-					else if (isNumber(ch))
+					else if (Is_Number(ch))
 					{
 						bufferCommand[indexCommand]=ch;
 						indexCommand++;
@@ -263,7 +381,7 @@ void getCommandReceived()
 						{
 							commandInterpreted=WAIT_COMMAND;
 						}
-						interpretComment();
+						Interpret_Command();
 					}
 					else if (ch==DIRECTION_COMMAND_STOP)
 					{
@@ -275,15 +393,17 @@ void getCommandReceived()
 						{
 							commandInterpreted=WAIT_COMMAND;
 						}						
-						interpretComment();
+						Interpret_Command();
 					}
 					else
 					{
 						commandInterpreted=WAIT_COMMAND;
-						interpretComment();
+						Interpret_Command();
 					}
 				}
 			}//No CR received
 		}		
 	}
 }
+#endif
+

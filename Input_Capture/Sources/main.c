@@ -74,15 +74,15 @@ LDD_TError ErrorDirectionCapture, FlagDirectionCapture;
 volatile uint32_t DataDirectionCapture;
 uint32_t DataDirectionCaptureOld;
 
+bool debuggingActivated=FALSE;
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
   /* Write your local variable definition here */
-  uint32_t dutySpeed_old=1000;
-  uint32_t dutyDirection_old=1000;
-  movement.direction=dutyDirection_old;
-  movement.speed=dutySpeed_old;  
+  uint32_t dutySpeed_old=0;
+  uint32_t dutyDirection_old=0;
   
   char buffer[10];
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
@@ -91,13 +91,15 @@ int main(void)
 
   /* Write your code here */
   SpeedCapture = Speed_Capture_Init((LDD_TUserData *)NULL);  
-  startSerial();
+  Start_Serial();
   
   ErrorSpeedCapture  = Speed_Capture_Reset(SpeedCapture);                       /* Reset the counter */
   FlagSpeedCapture  = 1U;
 
   while (1)
   {
+	  Get_Command_Received();
+	  
 	  #ifdef CAPTURE_AND_GENERATE_DEVICE
 		  if(FlagSpeedCapture == ERR_OK)
 		  {			  
@@ -106,93 +108,39 @@ int main(void)
 		  }
 		  if(FlagDirectionCapture == ERR_OK)
 		  {
-			  movement.speed=Set_New_Speed();
+			  movement.direction=Set_New_Direction();
 			  FlagDirectionCapture=1;
 		  }
-//		  		  {
-//		  			  FlagDirectionCapture=1;
-//		  			  Direction_Capture_GetCaptureValue(DirectionCapture, &DataDirectionCapture);		  
-//		  			  if(DataDirectionCaptureOld>DataDirectionCapture)
-//		  			  {
-//		  				  counterDirectionCapture=(65535-DataDirectionCaptureOld)+DataDirectionCapture;
-//		  			  }
-//		  			  else
-//		  			  {
-//		  				  counterDirectionCapture=DataDirectionCapture-DataDirectionCaptureOld;
-//		  			  }
-//		  			  DataDirectionCaptureOld=DataDirectionCapture;
-//		  			  /*TODO!: coger el nivel del pin para saber si estamos midiendo
-//		  			   * el duty o la frecuencia
-//		  			   */
-//		  			  if(counterDirectionCapture < 25000) //duty never will be less that 50%
-//		  			  {
-//		  				  timeHighDirection=counterDirectionCapture*1.53;			  
-//		  				  LEDB_Neg(); 
-//		  			  }
-//		  			  else
-//		  			  {
-//		  				  timeLowDirection=counterDirectionCapture*1.53;			  
-//		  			  }
-//		  			  if(counterPrint++==10)
-//		  			  {
-//		  				counterPrint=0;
-//		  				debugString((unsigned char *)"TimeHigh ");			  
-//		  				itoaDebug(timeHighDirection,&buffer[0]);
-//		  				debugStringRed((unsigned char *)buffer);
-//		  				debugString((unsigned char *)"us.TimeLow ");			  
-//		  				itoaDebug(timeLowDirection,&buffer[0]);
-//		  				debugStringRed((unsigned char *)buffer);
-//		  				debugString((unsigned char *)"us.Total ");			  
-//		  				itoaDebug(timeLowDirection+timeHighDirection,&buffer[0]);
-//		  				debugStringRed((unsigned char *)buffer);
-//		  				debugString((unsigned char *)"us\n\r");
-//		  			  }
-//		  			  movement.Direction=timeHighDirection;
-//		  		  }		  	  
-//		  		  if(movement.Direction!=dutyDirection_old)
-//		  		  {
-//		  			  dutyDirection_old=movement.Direction;
-//		  			  Direction_SetDutyUS(50000-dutyDirection_old);
-//		  			  
-//		  			  debugString((unsigned char *)"New duty Direction:");
-//		  			  itoaDebug(movement.Direction,&buffer[0]);
-//		  			  debugStringGreen((unsigned char *)buffer);
-//		  			  debugString((unsigned char *)"\n\r");
-//		  		  }
-//		  		  if(movement.direction!=dutyDirection_old)
-//		  		  {
-//		  			  dutyDirection_old=movement.direction;
-//		  			  Direction_SetDutyUS(50000-dutyDirection_old);
-//		  			  
-//		  			  debugString((unsigned char *)"New duty direction:");
-//		  			  itoaDebug(movement.direction,buffer);
-//		  			  debugStringRed((unsigned char *)buffer);
-//		  			  debugString((unsigned char *)"\n\r");
-//		  		  }
-//  	  	  }
 		  if(movement.speed!=dutySpeed_old)
 		  {
+			  Apply_Correction_Duty(&movement.speed,movement.correctionSpeed);
 			  dutySpeed_old=movement.speed;
 			  Speed_SetDutyUS(50000-dutySpeed_old);
 			  
-			  debugString((unsigned char *)"New duty speed:");
-			  itoaDebug(movement.speed,&buffer[0]);
-			  debugStringGreen((unsigned char *)buffer);
-			  debugString((unsigned char *)"\n\r");
+//			  if(debuggingActivated)
+//			  {
+//				  debugString((unsigned char *)"New duty speed:");				  
+//				  itoaDebug(movement.speed,&buffer[0]);
+//				  debugStringGreen((unsigned char *)buffer);
+//				  debugString((unsigned char *)"\n\r");
+//			  }
 		  }
 		  if(movement.direction!=dutyDirection_old)
 		  {
+			  Apply_Correction_Duty(&movement.direction,movement.correctionDirection);
 			  dutyDirection_old=movement.direction;
 			  Direction_SetDutyUS(50000-dutyDirection_old);
 			  
-			  debugString((unsigned char *)"New duty direction:");
-			  itoaDebug(movement.direction,buffer);
-			  debugStringRed((unsigned char *)buffer);
-			  debugString((unsigned char *)"\n\r");
+//			  if(debuggingActivated)
+//			  {  
+//				  debugString((unsigned char *)"New duty direction:");
+//			  	  itoaDebug(movement.direction,buffer);
+//			  	  debugStringRed((unsigned char *)buffer);
+//			  	  debugString((unsigned char *)"\n\r");
+//			  }
 		  }
 	  #else //GENERATE PWM from CONSOLE
-		  getCommandReceived();
-		  
+		  		  
 		  if(movement.speed!=dutySpeed_old)
 		  {
 			  dutySpeed_old=movement.speed;

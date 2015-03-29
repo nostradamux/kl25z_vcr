@@ -16,6 +16,12 @@
 #define SPEED_COMMAND_STOP 		's'
 #define DIRECTION_COMMAND_START 'D'
 #define DIRECTION_COMMAND_STOP 	'd'
+
+#define CORRECTION_SPEED_COMMAND_START 		'S'
+#define CORRECTION_SPEED_COMMAND_STOP 		's'
+#define CORRECTION_DIRECTION_COMMAND_START 	'D'
+#define CORRECTION_DIRECTION_COMMAND_STOP 	'd'
+
 #define SIZE_BUFFER_COMMAND		20
 
 #define ANSI_COLOR_NO  		"\033[0m"
@@ -29,14 +35,12 @@ enum
 	START_SPEED,
 	STOP_SPEED,
 	START_DIRECTION,
-	STOP_DIRECTION
+	STOP_DIRECTION,
+	CORRECTION_START_SPEED,
+	CORRECTION_STOP_SPEED,
+	CORRECTION_START_DIRECTION,
+	CORRECTION_STOP_DIRECTION
 };
-
-typedef struct
-{
-	int32 speed;
-	int32 direction;
-}movementType;
 
 typedef struct {
   LDD_TDeviceData *handle; /* LDD device handle */
@@ -45,21 +49,22 @@ typedef struct {
   uint8_t (*rxPutFct)(uint8_t); /* callback to put received character into buffer */
 } UART_Desc;
  
-void printHex(unsigned char data);
-void SendChar(unsigned char ch, UART_Desc *desc); 
-void SendString(const unsigned char *str,  UART_Desc *desc);
-void InitSerial(void);
-void startSerial(void) ;
-void debugString(const unsigned char *str);
-char* itoaDebug(int i, char b[]);
-void debugChar(const unsigned char data);
-void getDebugString(void);
-uint8 isNumber(uint8 ch);
-void initBufferCommnad(void);
-int myAtoi(char *str);
-void getCommandReceived();
-void debugStringGreen(const unsigned char *str);
-void debugStringRed(const unsigned char *str);
-void debugStringYellow(const unsigned char *str);
+void Print_Hex(unsigned char data);
+void Send_Char(unsigned char ch, UART_Desc *desc); 
+void Send_String(const unsigned char *str,  UART_Desc *desc);
+void Init_Serial(void);
+void Start_Serial(void) ;
+void Debug_String(const unsigned char *str);
+char* Itoa_Debug(int i, char b[]);
+void Debug_Char(const unsigned char data);
+void Get_Debug_String(void);
+uint8 Is_Number(uint8 ch);
+void Init_Buffer_Commnad(void);
+int My_Atoi(char *str);
+void Get_Command_Received();
+void Debug_String_Green(const unsigned char *str);
+void Debug_String_Red(const unsigned char *str);
+void Debug_String_Yellow(const unsigned char *str);
+void Interpret_Command();
 
 #endif /* DEBUGSERIAL_H_ */

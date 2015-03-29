@@ -7,9 +7,9 @@
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
-#define CAPTURE_AND_GENERATE_DEVICE 1
 
 uint32_t Set_New_Speed();
 uint32_t Set_New_Direction();
+void Apply_Correction_Duty(int32 *valueToCorrect, int32 correction);
 
 #endif /* APPLICATION_H_ */

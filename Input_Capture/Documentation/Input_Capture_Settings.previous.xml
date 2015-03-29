@@ -1182,6 +1182,140 @@ PE_DEBUGHALT();
       <event name="OnOverrun" v="don&amp;apos;t generate code" />
     </Events>
   </Bean>
+  <Bean name="Direction_Capture" type="Capture_LDD">
+    <Enabled v="Y" />
+    <Properties>
+      <Component_name v="Direction_Capture" />
+      <Capture_device v="TPM0_C1V" />
+      <Counter v="TPM0_CNT" />
+      <Counter_direction v="Up" />
+      <Counter_width v="16 bits" />
+      <Value_type v="Optimal" />
+      <boolgroup name="Interrupt service/event" v="Enabled">
+        <Interrupt v="INT_TPM0" />
+        <Interrupt_priority v="high priority" />
+      </boolgroup>
+      <group name="Event">
+        <Input_pin v="ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1" />
+        <Edge v="both edges" />
+        <Maximum_time_of_event v="100 ms" />
+      </group>
+      <group name="Initialization">
+        <Enabled_in_init__code v="yes" />
+        <list name="Auto Initialization" v="1">
+          <Auto_initialization v="no" />
+        </list>
+        <group name="Event mask">
+          <OnCapture v="Enabled" />
+          <OnOverrun v="Disabled" />
+        </group>
+      </group>
+      <list name="CPU clock/configuration selection (included)" v="1">
+        <group name="CPU clock/configuration selection">
+          <Clock_configuration_0 v="This component enabled" />
+          <Clock_configuration_1 v="This component disabled" />
+          <Clock_configuration_2 v="This component disabled" />
+          <Clock_configuration_3 v="This component disabled" />
+          <Clock_configuration_4 v="This component disabled" />
+          <Clock_configuration_5 v="This component disabled" />
+          <Clock_configuration_6 v="This component disabled" />
+          <Clock_configuration_7 v="This component disabled" />
+        </group>
+      </list>
+      <group name="Referenced components">
+        <Linked_TimerUnit v="TU2" />
+      </group>
+    </Properties>
+    <Methods>
+      <Init v="generate code" />
+      <Deinit v="don&amp;apos;t generate code" />
+      <Enable v="generate code" />
+      <Disable v="generate code" />
+      <SetEventMask v="don&amp;apos;t generate code" />
+      <GetEventMask v="don&amp;apos;t generate code" />
+      <GetEventStatus v="don&amp;apos;t generate code" />
+      <Reset v="generate code" />
+      <GetCaptureValue v="generate code" />
+      <SelectCaptureEdge v="generate code" />
+      <ConnectPin v="don&amp;apos;t generate code" />
+      <SetOperationMode v="don&amp;apos;t generate code" />
+      <GetDriverState v="don&amp;apos;t generate code" />
+    </Methods>
+    <Events>
+      <Event_module_name v="Events" />
+      <event name="OnCapture" v="generate code">
+        <Event_procedure_name v="Direction_Capture_OnCapture" />
+      </event>
+      <event name="OnOverrun" v="don&amp;apos;t generate code" />
+    </Events>
+  </Bean>
+  <Bean name="Tacometer_Capture" type="Capture_LDD">
+    <Enabled v="Y" />
+    <Properties>
+      <Component_name v="Tacometer_Capture" />
+      <Capture_device v="TPM0_C3V" />
+      <Counter v="TPM0_CNT" />
+      <Counter_direction v="Up" />
+      <Counter_width v="16 bits" />
+      <Value_type v="Optimal" />
+      <boolgroup name="Interrupt service/event" v="Enabled">
+        <Interrupt v="INT_TPM0" />
+        <Interrupt_priority v="high priority" />
+      </boolgroup>
+      <group name="Event">
+        <Input_pin v="PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI" />
+        <Edge v="both edges" />
+        <Maximum_time_of_event v="100 ms" />
+      </group>
+      <group name="Initialization">
+        <Enabled_in_init__code v="yes" />
+        <list name="Auto Initialization" v="1">
+          <Auto_initialization v="no" />
+        </list>
+        <group name="Event mask">
+          <OnCapture v="Enabled" />
+          <OnOverrun v="Disabled" />
+        </group>
+      </group>
+      <list name="CPU clock/configuration selection (included)" v="1">
+        <group name="CPU clock/configuration selection">
+          <Clock_configuration_0 v="This component enabled" />
+          <Clock_configuration_1 v="This component disabled" />
+          <Clock_configuration_2 v="This component disabled" />
+          <Clock_configuration_3 v="This component disabled" />
+          <Clock_configuration_4 v="This component disabled" />
+          <Clock_configuration_5 v="This component disabled" />
+          <Clock_configuration_6 v="This component disabled" />
+          <Clock_configuration_7 v="This component disabled" />
+        </group>
+      </list>
+      <group name="Referenced components">
+        <Linked_TimerUnit v="TU2" />
+      </group>
+    </Properties>
+    <Methods>
+      <Init v="generate code" />
+      <Deinit v="don&amp;apos;t generate code" />
+      <Enable v="generate code" />
+      <Disable v="generate code" />
+      <SetEventMask v="don&amp;apos;t generate code" />
+      <GetEventMask v="don&amp;apos;t generate code" />
+      <GetEventStatus v="don&amp;apos;t generate code" />
+      <Reset v="generate code" />
+      <GetCaptureValue v="generate code" />
+      <SelectCaptureEdge v="generate code" />
+      <ConnectPin v="don&amp;apos;t generate code" />
+      <SetOperationMode v="don&amp;apos;t generate code" />
+      <GetDriverState v="don&amp;apos;t generate code" />
+    </Methods>
+    <Events>
+      <Event_module_name v="Events" />
+      <event name="OnCapture" v="generate code">
+        <Event_procedure_name v="Tacometer_Capture_OnCapture" />
+      </event>
+      <event name="OnOverrun" v="don&amp;apos;t generate code" />
+    </Events>
+  </Bean>
   <Bean name="TU2" type="TimerUnit_LDD">
     <Enabled v="Y" />
     <Properties>
@@ -1198,11 +1332,35 @@ PE_DEBUGHALT();
         <Overrun_period v="100 ms" />
         <boolgroup name="Interrupt" v="Disabled" />
       </enumgroup>
-      <list name="Channel list" v="1">
+      <list name="Channel list" v="3">
         <group name="Channel 0">
+          <enumgroup name="Mode" v="Capture">
+            <Capture v="TPM0_C1V" />
+            <Capture_input_pin v="ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1" />
+            <Edge v="both edges" />
+            <Maximum_time_of_event v="100.000006144 ms" />
+            <boolgroup name="Interrupt" v="Enabled">
+              <Interrupt v="INT_TPM0" />
+              <Interrupt_priority v="high priority" />
+            </boolgroup>
+          </enumgroup>
+        </group>
+        <group name="Channel 1">
           <enumgroup name="Mode" v="Capture">
             <Capture v="TPM0_C0V" />
             <Capture_input_pin v="ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0" />
+            <Edge v="both edges" />
+            <Maximum_time_of_event v="100.000006144 ms" />
+            <boolgroup name="Interrupt" v="Enabled">
+              <Interrupt v="INT_TPM0" />
+              <Interrupt_priority v="high priority" />
+            </boolgroup>
+          </enumgroup>
+        </group>
+        <group name="Channel 2">
+          <enumgroup name="Mode" v="Capture">
+            <Capture v="TPM0_C3V" />
+            <Capture_input_pin v="PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI" />
             <Edge v="both edges" />
             <Maximum_time_of_event v="100.000006144 ms" />
             <boolgroup name="Interrupt" v="Enabled">
@@ -1220,8 +1378,8 @@ PE_DEBUGHALT();
         <group name="Event mask">
           <OnCounterRestart v="Disabled" />
           <OnChannel0 v="Enabled" />
-          <OnChannel1 v="Disabled" />
-          <OnChannel2 v="Disabled" />
+          <OnChannel1 v="Enabled" />
+          <OnChannel2 v="Enabled" />
           <OnChannel3 v="Disabled" />
           <OnChannel4 v="Disabled" />
           <OnChannel5 v="Disabled" />
@@ -1245,18 +1403,18 @@ PE_DEBUGHALT();
     <Methods>
       <Init v="generate code" />
       <Deinit v="don&amp;apos;t generate code" />
-      <Enable v="generate code" />
-      <Disable v="generate code" />
-      <SetEventMask v="don&amp;apos;t generate code" />
-      <GetEventMask v="don&amp;apos;t generate code" />
+      <Enable v="don&amp;apos;t generate code" />
+      <Disable v="don&amp;apos;t generate code" />
+      <SetEventMask v="generate code" />
+      <GetEventMask v="generate code" />
       <GetEventStatus v="don&amp;apos;t generate code" />
       <SelectInputFrequency v="don&amp;apos;t generate code" />
       <GetInputFrequencyReal v="don&amp;apos;t generate code" />
       <GetInputFrequency v="don&amp;apos;t generate code" />
       <SetPeriodTicks v="don&amp;apos;t generate code" />
       <GetPeriodTicks v="don&amp;apos;t generate code" />
-      <ResetCounter v="generate code" />
-      <GetCounterValue v="don&amp;apos;t generate code" />
+      <ResetCounter v="don&amp;apos;t generate code" />
+      <GetCounterValue v="generate code" />
       <SetOffsetTicks v="don&amp;apos;t generate code" />
       <GetOffsetTicks v="don&amp;apos;t generate code" />
       <GetCaptureValue v="generate code" />
@@ -1272,8 +1430,12 @@ PE_DEBUGHALT();
       <event name="OnChannel0" v="generate code">
         <Event_procedure_name v="TU2_OnChannel0" />
       </event>
-      <event name="OnChannel1" v="don&amp;apos;t generate code" />
-      <event name="OnChannel2" v="don&amp;apos;t generate code" />
+      <event name="OnChannel1" v="generate code">
+        <Event_procedure_name v="TU2_OnChannel1" />
+      </event>
+      <event name="OnChannel2" v="generate code">
+        <Event_procedure_name v="TU2_OnChannel2" />
+      </event>
       <event name="OnChannel3" v="don&amp;apos;t generate code" />
       <event name="OnChannel4" v="don&amp;apos;t generate code" />
       <event name="OnChannel5" v="don&amp;apos;t generate code" />
@@ -1281,36 +1443,117 @@ PE_DEBUGHALT();
       <event name="OnChannel7" v="don&amp;apos;t generate code" />
     </Events>
   </Bean>
-  <Bean name="Bit1" type="BitIO_LDD">
+  <Bean name="CheckPoint" type="Serial_LDD">
     <Enabled v="Y" />
+    <Template v="FRDM_KL25Z_UART" />
     <Properties>
-      <Component_name v="Bit1" />
-      <Pin_for_I_O v="PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUTa" />
-      <Direction v="Input" />
-      <group name="Initialization">
-        <Init__direction v="Input" />
-        <Init__value v="0" />
-        <Auto_initialization v="no" />
+      <Component_name v="CheckPoint" />
+      <Device v="UART1" />
+      <boolgroup name="Interrupt service/event" v="Enabled">
+        <Interrupt_RxD v="INT_UART1" />
+        <Interrupt_RxD_priority v="maximal priority" />
+        <Interrupt_TxD v="INT_UART1" />
+        <Interrupt_TxD_priority v="maximal priority" />
+        <Interrupt_Error v="INT_UART1" />
+        <Interrupt_Error_priority v="maximal priority" />
+      </boolgroup>
+      <group name="Settings">
+        <Data_width v="8 bits" />
+        <Parity v="None" />
+        <Stop_bits v="1" />
+        <Loop_mode v="Normal" />
+        <Baud_rate v="1310720 baud" />
+        <Wakeup_condition v="Idle line wakeup" />
+        <Stop_in_wait_mode v="no" />
+        <Idle_line_mode v="Starts after start bit" />
+        <Transmitter_output v="Not inverted" />
+        <Receiver_input v="Not inverted" />
+        <Break_generation_length v="10/11 bits" />
+        <boolgroup name="Receiver" v="Enabled">
+          <RxD v="EXTAL0/PTA18/UART1_RX/TPM_CLKIN0" />
+        </boolgroup>
+        <boolgroup name="Transmitter" v="Enabled">
+          <TxD v="PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3" />
+        </boolgroup>
+        <enumgroup name="Flow control" v="None">
+          <EmptySection_DummyValue />
+        </enumgroup>
       </group>
-      <Safe_mode v="no" />
+      <group name="Initialization">
+        <Enabled_in_init__code v="yes" />
+        <list name="Auto Initialization" v="1">
+          <Auto_initialization v="yes" />
+        </list>
+        <group name="Event mask">
+          <OnBlockSent v="Enabled" />
+          <OnBlockReceived v="Enabled" />
+          <OnTxComplete v="Disabled" />
+          <OnError v="Disabled" />
+          <OnBreak v="Disabled" />
+        </group>
+      </group>
+      <list name="CPU clock/configuration selection (included)" v="1">
+        <group name="CPU clock/configuration selection">
+          <Clock_configuration_0 v="This component enabled" />
+          <Clock_configuration_1 v="This component disabled" />
+          <Clock_configuration_2 v="This component disabled" />
+          <Clock_configuration_3 v="This component disabled" />
+          <Clock_configuration_4 v="This component disabled" />
+          <Clock_configuration_5 v="This component disabled" />
+          <Clock_configuration_6 v="This component disabled" />
+          <Clock_configuration_7 v="This component disabled" />
+        </group>
+      </list>
     </Properties>
     <Methods>
       <Init v="generate code" />
-      <Deinit v="don&amp;apos;t generate code" />
-      <GetDir v="don&amp;apos;t generate code" />
-      <SetDir v="don&amp;apos;t generate code" />
-      <SetInput v="don&amp;apos;t generate code" />
-      <SetOutput v="don&amp;apos;t generate code" />
-      <GetVal v="generate code" />
-      <PutVal v="don&amp;apos;t generate code" />
-      <ClrVal v="don&amp;apos;t generate code" />
-      <SetVal v="don&amp;apos;t generate code" />
-      <NegVal v="don&amp;apos;t generate code" />
+      <Deinit v="generate code" />
+      <Enable v="don&amp;apos;t generate code" />
+      <Disable v="don&amp;apos;t generate code" />
+      <SendBlock v="generate code" />
+      <ReceiveBlock v="generate code" />
+      <CancelBlockTransmission v="don&amp;apos;t generate code" />
+      <CancelBlockReception v="don&amp;apos;t generate code" />
+      <GetError v="don&amp;apos;t generate code" />
+      <GetSentDataNum v="generate code" />
+      <GetReceivedDataNum v="generate code" />
+      <GetTxCompleteStatus v="generate code" />
+      <SetEventMask v="don&amp;apos;t generate code" />
+      <GetEventMask v="don&amp;apos;t generate code" />
+      <SelectBaudRate v="don&amp;apos;t generate code" />
+      <GetSelectedBaudRate v="don&amp;apos;t generate code" />
+      <SetParity v="don&amp;apos;t generate code" />
+      <GetParity v="don&amp;apos;t generate code" />
+      <SetDataWidth v="don&amp;apos;t generate code" />
+      <GetDataWidth v="don&amp;apos;t generate code" />
+      <SetStopBitLength v="don&amp;apos;t generate code" />
+      <GetStopBitLength v="don&amp;apos;t generate code" />
+      <SetLoopMode v="don&amp;apos;t generate code" />
+      <GetLoopMode v="don&amp;apos;t generate code" />
+      <GetStats v="don&amp;apos;t generate code" />
+      <ClearStats v="don&amp;apos;t generate code" />
+      <SendBreak v="don&amp;apos;t generate code" />
+      <GetBreak v="don&amp;apos;t generate code" />
+      <TurnTxOn v="don&amp;apos;t generate code" />
+      <TurnTxOff v="don&amp;apos;t generate code" />
+      <TurnRxOn v="don&amp;apos;t generate code" />
+      <TurnRxOff v="don&amp;apos;t generate code" />
       <ConnectPin v="don&amp;apos;t generate code" />
-      <GetRawVal v="don&amp;apos;t generate code" />
+      <Main v="don&amp;apos;t generate code" />
+      <SetOperationMode v="don&amp;apos;t generate code" />
+      <GetDriverState v="don&amp;apos;t generate code" />
     </Methods>
     <Events>
-      <EmptySection_DummyValue />
+      <Event_module_name v="Events" />
+      <event name="OnBlockReceived" v="generate code">
+        <Event_procedure_name v="CheckPoint_OnBlockReceived" />
+      </event>
+      <event name="OnBlockSent" v="generate code">
+        <Event_procedure_name v="CheckPoint_OnBlockSent" />
+      </event>
+      <event name="OnBreak" v="don&amp;apos;t generate code" />
+      <event name="OnError" v="don&amp;apos;t generate code" />
+      <event name="OnTxComplete" v="don&amp;apos;t generate code" />
     </Events>
   </Bean>
 </PE_PROJECT_SETTINGS_DOCUMENTATION>
