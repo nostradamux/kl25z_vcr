@@ -56,6 +56,7 @@
 #include "Tacometer_Capture.h"
 #include "TU2.h"
 #include "CheckPoint.h"
+#include "Tacometer_Simulator.h"
 
 #ifdef __cplusplus
 extern "C" {

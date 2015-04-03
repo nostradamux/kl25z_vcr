@@ -7,7 +7,7 @@
 **     Version     : Component 01.025, Driver 01.04, CPU db: 3.00.000
 **     Datasheet   : KL25P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
+**     Date/Time   : 2015-04-03, 11:52, # CodeGen: 43
 **     Abstract    :
 **
 **     Settings    :
@@ -82,6 +82,7 @@
 #include "Tacometer_Capture.h"
 #include "TU2.h"
 #include "CheckPoint.h"
+#include "Tacometer_Simulator.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"

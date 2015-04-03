@@ -6,7 +6,7 @@
 **     Component   : PE_Types
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
+**     Date/Time   : 2015-04-03, 11:52, # CodeGen: 43
 **     Abstract    :
 **         PE_Types.h - contains definitions of basic types,
 **         register access macros and hardware specific macros
@@ -215,6 +215,7 @@ typedef unsigned long int       uint32;
 #define PE_LDD_COMPONENT_Direction_Capture_ID    0x09U
 #define PE_LDD_COMPONENT_Tacometer_Capture_ID    0x0AU
 #define PE_LDD_COMPONENT_CheckPoint_ID           0x0BU
+#define PE_LDD_COMPONENT_Tacometer_Simulator_ID  0x0CU
 
 /*
 ** ===================================================================

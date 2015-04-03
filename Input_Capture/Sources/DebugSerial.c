@@ -14,7 +14,7 @@ static uint8 bufferCommand[SIZE_BUFFER_COMMAND];
 static uint8 indexCommand=0;
 static uint8 commandInterpreted=WAIT_COMMAND;
 
-movementType movement={1000,1000,0,0};
+movementType movement={1000,1000,0,0,0};
 
 void Print_Hex(unsigned char data)
 {
@@ -143,7 +143,7 @@ void Init_Serial(void) {
 void Start_Serial()
 {
 	Init_Serial();
-	
+	char buffer[10];
 	Debug_String_Yellow((unsigned char*)"\r\n*******************************************************\r\n");
 	Debug_String_Yellow((unsigned char*)"                     ");
 	Debug_String_Yellow((unsigned char*)VERSION);
@@ -158,9 +158,17 @@ void Start_Serial()
 		Debug_String((unsigned char*)"\r\nWrite Sxxxs (xxx=number) to correct Speed (us Duty). \r\nWrite Dxxxd (xxx=number) to correct Direction (us Duty) \r\n");
 		Debug_String((unsigned char*)"Activate/Deactivate Debugging info pressing 'I' or 'i'. \r\nBy default is deactivated \r\n\r\n\r\n");
 	#else
-		Debug_String((unsigned char*)"\r\nWrite Sxxxs (xxx=number) to change Speed (us Duty). \r\nWrite Dxxxd (xxx=number) to change Direction (us Duty) \r\n\r\n\r\n");
+		Debug_String((unsigned char*)"\r\nWrite Sxxxs (xxx=number) to change Speed (us Duty). Output Pin PTA13 ");
+		Debug_String((unsigned char*)"\r\nWrite Dxxxd (xxx=number) to change Direction (us Duty). Output Pin PTA12 ");
+		Debug_String((unsigned char*)"\r\nWrite Txxxt (xxx=number) to change Tachometer (ms Period, range [");
+		Itoa_Debug((int)Tacometer_Simulator_SPMS_MIN,&buffer[0]);
+		Debug_String((unsigned char *)buffer);
+		Debug_String((unsigned char*)",");
+		Itoa_Debug((int)Tacometer_Simulator_SPMS_MAX,&buffer[0]);
+		Debug_String((unsigned char *)buffer);
+		Debug_String((unsigned char*)"]). Output Pin PTB3 \r\n\r\n\r\n");
 	#endif
-	 initBufferCommnad();
+	 Init_Buffer_Commnad();
 }
 
 void Get_Debug_String()
@@ -180,7 +188,7 @@ uint8 Is_Number(uint8 ch)
 	return ((ch>47)&&(ch<58));
 }
 
-void initBufferCommnad()
+void Init_Buffer_Commnad()
 {
 	uint16 i=0;
 	for(i=0;i<SIZE_BUFFER_COMMAND;i++)
@@ -217,6 +225,11 @@ void Interpret_Command()
 					Debug_String_Green(bufferCommand);
 					movement.speed=My_Atoi((char*)bufferCommand);
 					break;
+				case(STOP_TACHOMETER):
+					Debug_String((unsigned char*)"\r\nTachometer received:");
+					Debug_String_Green(bufferCommand);
+					movement.tacho=My_Atoi((char*)bufferCommand);
+					break;
 			#endif
 			default:
 					Debug_String((unsigned char*)"\r\nWrong Command!");
@@ -224,7 +237,7 @@ void Interpret_Command()
 	}
 	Debug_String((unsigned char*)"\r\n");
 	indexCommand=0;
-	initBufferCommnad();
+	Init_Buffer_Commnad();
 }
 
 #ifdef CAPTURE_AND_GENERATE_DEVICE
@@ -238,7 +251,7 @@ void Get_Command_Received()
 			(void)RxBuf_Get(&ch);			
 			if(ch==13)//Retorno de carro (CR)
 			{
-				initBufferCommnad();				
+				Init_Buffer_Commnad();				
 				Debug_String((unsigned char*)"\r\n");
 			}
 			else if ((ch=='I')||(ch=='i'))
@@ -274,12 +287,12 @@ void Get_Command_Received()
 					if (ch==CORRECTION_SPEED_COMMAND_START)
 					{
 						commandInterpreted=CORRECTION_START_SPEED;
-						initBufferCommnad();
+						Init_Buffer_Commnad();
 					}
 					else if (ch==CORRECTION_DIRECTION_COMMAND_START)
 					{
 						commandInterpreted=CORRECTION_START_DIRECTION;					
-						initBufferCommnad();
+						Init_Buffer_Commnad();
 					}
 					else if (ch=='-')
 					{
@@ -336,7 +349,7 @@ void Get_Command_Received()
 			(void)RxBuf_Get(&ch);			
 			if(ch==13)//Retorno de carro (CR)
 			{
-				initBufferCommnad();				
+				Init_Buffer_Commnad();				
 				Debug_String((unsigned char*)"\r\n");
 			}
 			else
@@ -353,18 +366,29 @@ void Get_Command_Received()
 						commandInterpreted=START_DIRECTION;
 						indexCommand=0;
 					}
+					if (ch==TACHOMETER_COMMAND_START)
+					{
+						commandInterpreted=START_DIRECTION;
+						indexCommand=0;
+					}
 				}
-				else if((commandInterpreted==START_DIRECTION)||(commandInterpreted==START_SPEED))
+				else if((commandInterpreted==START_DIRECTION)||(commandInterpreted==START_SPEED)
+						||(commandInterpreted==START_TACHOMETER))
 				{
 					if (ch==SPEED_COMMAND_START)
 					{
 						commandInterpreted=START_SPEED;
-						initBufferCommnad();
+						Init_Buffer_Commnad();
 					}
 					else if (ch==DIRECTION_COMMAND_START)
 					{
 						commandInterpreted=START_DIRECTION;					
-						initBufferCommnad();
+						Init_Buffer_Commnad();
+					}
+					else if (ch==TACHOMETER_COMMAND_START)
+					{
+						commandInterpreted=START_TACHOMETER;					
+						Init_Buffer_Commnad();
 					}
 					else if (Is_Number(ch))
 					{
@@ -388,6 +412,18 @@ void Get_Command_Received()
 						if(indexCommand>0)
 						{
 							commandInterpreted=STOP_DIRECTION;
+						}
+						else
+						{
+							commandInterpreted=WAIT_COMMAND;
+						}						
+						Interpret_Command();
+					}
+					else if (ch==TACHOMETER_COMMAND_STOP)
+					{
+						if(indexCommand>0)
+						{
+							commandInterpreted=STOP_TACHOMETER;
 						}
 						else
 						{

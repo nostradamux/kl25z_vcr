@@ -2,7 +2,7 @@
  * DebugSerial.h
  *
  *  Created on: Feb 22, 2015
- *      Author: Administrador
+ *      Author: pvarela
  */
 
 #ifndef DEBUGSERIAL_H_
@@ -12,10 +12,12 @@
 #include "PE_LDD.h"
 #include "General_Definitions.h"
 
-#define SPEED_COMMAND_START 	'S'
-#define SPEED_COMMAND_STOP 		's'
-#define DIRECTION_COMMAND_START 'D'
-#define DIRECTION_COMMAND_STOP 	'd'
+#define SPEED_COMMAND_START 		'S'
+#define SPEED_COMMAND_STOP 			's'
+#define DIRECTION_COMMAND_START 	'D'
+#define DIRECTION_COMMAND_STOP 		'd'
+#define TACHOMETER_COMMAND_START	'T'
+#define TACHOMETER_COMMAND_STOP		't'
 
 #define CORRECTION_SPEED_COMMAND_START 		'S'
 #define CORRECTION_SPEED_COMMAND_STOP 		's'
@@ -36,6 +38,8 @@ enum
 	STOP_SPEED,
 	START_DIRECTION,
 	STOP_DIRECTION,
+	START_TACHOMETER,
+	STOP_TACHOMETER,
 	CORRECTION_START_SPEED,
 	CORRECTION_STOP_SPEED,
 	CORRECTION_START_DIRECTION,
@@ -66,5 +70,6 @@ void Debug_String_Green(const unsigned char *str);
 void Debug_String_Red(const unsigned char *str);
 void Debug_String_Yellow(const unsigned char *str);
 void Interpret_Command();
+void Init_Buffer_Commnad();
 
 #endif /* DEBUGSERIAL_H_ */

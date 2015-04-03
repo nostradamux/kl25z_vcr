@@ -609,7 +609,7 @@ registers of the peripheral(s) configured by the component.
 **                  Output on overrun                      : Clear
 **                  Initial state                          : Low
 **                  Output pin                             : PTA13/TPM1_CH1
-**                  Output pin signal                      : Speed_PTE21
+**                  Output pin signal                      : Speed_Signal
 **                Interrupt                                : Disabled
 **            Channel 1                                    : 
 **              Mode                                       : Compare
@@ -619,7 +619,7 @@ registers of the peripheral(s) configured by the component.
 **                  Output on overrun                      : Clear
 **                  Initial state                          : Low
 **                  Output pin                             : PTA12/TPM1_CH0
-**                  Output pin signal                      : Speed_PTE20
+**                  Output pin signal                      : Direction_signal
 **                Interrupt                                : Disabled
 **          Initialization                                 : 
 **            Enabled in init. code                        : yes

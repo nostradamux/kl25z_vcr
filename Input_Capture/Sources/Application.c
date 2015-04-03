@@ -4,7 +4,7 @@
 #include "LEDB.h"
 #include "LEDG.h"
 #include "Application.h"
-#include "General_Definitions.h"
+#include "Tacometer_Simulator.h"
 
 extern movementType movement;
 extern LDD_TDeviceData *SpeedCapture;
@@ -13,6 +13,9 @@ extern LDD_TError FlagSpeedCapture;
 extern movementType movement;
 extern LDD_TDeviceData *DirectionCapture;
 extern LDD_TError FlagDirectionCapture;
+
+static uint16_t periodTacometerOld=0;
+LDD_TDeviceData *tacometer;
 
 uint32_t Set_New_Speed()
 {
@@ -129,3 +132,36 @@ void Apply_Correction_Duty(int32 *valueToCorrect, int32 correction)
 		*valueToCorrect=0;
 	}
 }
+
+#ifndef CAPTURE_AND_GENERATE_DEVICE
+void Init_Tacometer_Simulator()
+{
+	tacometer=Tacometer_Simulator_Init(NULL);
+}
+void Set_Tacometer_Pulses()
+{
+	char buffer[10];
+	
+	if (movement.tacho!=periodTacometerOld)
+	{
+		if (movement.tacho>Tacometer_Simulator_SPMS_MAX)
+		{
+			Debug_String((unsigned char *)"Wrong period selected!\n\r");
+			movement.tacho=Tacometer_Simulator_SPMS_MAX;		
+		}
+		if (movement.tacho<Tacometer_Simulator_SPMS_MIN)
+		{
+			Debug_String((unsigned char *)"Wrong period selected!\n\r");
+			movement.tacho=Tacometer_Simulator_SPMS_MIN;		
+		}
+		periodTacometerOld=movement.tacho;
+		Debug_String((unsigned char *)"Tachometer period changed to:");	
+		Itoa_Debug((int)movement.tacho,&buffer[0]);
+		Debug_String_Red((unsigned char *)buffer);
+		Debug_String_Red((unsigned char *)"\n\r");
+		
+		Tacometer_Simulator_SetPeriodMS(tacometer, movement.tacho);
+		Tacometer_Simulator_SetRatio16(tacometer, 0xFFFF/2);
+	}
+}
+#endif

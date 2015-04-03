@@ -40,6 +40,7 @@
 - \subpage Direction_Capture
 - \subpage Tacometer_Capture
 - \subpage CheckPoint
+- \subpage Tacometer_Simulator
 
 
 */

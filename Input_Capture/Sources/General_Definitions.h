@@ -2,7 +2,7 @@
  * General_Definitions.h
  *
  *  Created on: Mar 28, 2015
- *      Author: Administrador
+ *      Author: pvarela
  */
 
 #ifndef GENERAL_DEFINITIONS_H_
@@ -14,6 +14,7 @@ typedef struct
 	int32 direction;
 	int32 correctionSpeed;
 	int32 correctionDirection;
+	uint32 tacho;
 }movementType;
 
 /*
@@ -21,7 +22,7 @@ typedef struct
  * If is not defined, they will be generated depending on value introduced by 
  * console. 
  */
-#define CAPTURE_AND_GENERATE_DEVICE 1
+//#define CAPTURE_AND_GENERATE_DEVICE 1
 #define VERSION	"VCR_V0_1"
 
 extern bool debuggingActivated;

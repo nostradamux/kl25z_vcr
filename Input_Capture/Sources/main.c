@@ -52,6 +52,7 @@
 #include "Tacometer_Capture.h"
 #include "TU2.h"
 #include "CheckPoint.h"
+#include "Tacometer_Simulator.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -92,6 +93,10 @@ int main(void)
   /* Write your code here */
   SpeedCapture = Speed_Capture_Init((LDD_TUserData *)NULL);  
   Start_Serial();
+  
+  #ifndef CAPTURE_AND_GENERATE_DEVICE
+  	  Init_Tacometer_Simulator();
+  #endif
   
   ErrorSpeedCapture  = Speed_Capture_Reset(SpeedCapture);                       /* Reset the counter */
   FlagSpeedCapture  = 1U;
@@ -140,32 +145,30 @@ int main(void)
 //			  }
 		  }
 	  #else //GENERATE PWM from CONSOLE
-		  		  
+		  Set_Tacometer_Pulses();		  
 		  if(movement.speed!=dutySpeed_old)
 		  {
 			  dutySpeed_old=movement.speed;
 			  Speed_SetDutyUS(50000-dutySpeed_old);
 			  
-			  debugString((unsigned char *)"New duty speed:");
-			  itoaDebug(movement.speed,&buffer[0]);
-			  debugStringGreen((unsigned char *)buffer);
-			  debugString((unsigned char *)"\n\r");
+			  Debug_String((unsigned char *)"New duty speed:");
+			  Itoa_Debug(movement.speed,&buffer[0]);
+			  Debug_String_Green((unsigned char *)buffer);
+			  Debug_String((unsigned char *)"\n\r");
 		  }
 		  if(movement.direction!=dutyDirection_old)
 		  {
 			  dutyDirection_old=movement.direction;
 			  Direction_SetDutyUS(50000-dutyDirection_old);
 			  
-			  debugString((unsigned char *)"New duty direction:");
-			  itoaDebug(movement.direction,buffer);
-			  debugStringRed((unsigned char *)buffer);
-			  debugString((unsigned char *)"\n\r");
+			  Debug_String((unsigned char *)"New duty direction:");
+			  Itoa_Debug(movement.direction,buffer);
+			  Debug_String_Red((unsigned char *)buffer);
+			  Debug_String((unsigned char *)"\n\r");
 		  }
 		  WAIT1_Waitms(50);
 		  LEDG_Neg();
-	 #endif
-	  	   
-	  
+	 #endif	  
   }
   /* For example: for(;;) { } */
 

@@ -207,6 +207,23 @@ Module "CheckPoint" (component FRDM_KL25Z_UART)
                 this method the status is returned and cleared (set to "false" state). This method is available only if a 
                 peripheral supports this feature.
 
+Module "Tacometer_Simulator" (component PPG_LDD)
+   - Tacometer_Simulator_Init -Initializes the device. Allocates memory for the device data structure, allocates interrupt 
+                vectors and sets interrupt priority, sets pin routing, sets timing, etc. If the property <"Enable in init. 
+                code"> is set to "yes" value then the device is also enabled (see the description of the <Enable> method). In 
+                this case the <Enable> method is not necessary and needn't to be generated. This method can be called only once.
+                Before the second call of Init the <Deinit> must be called first.
+   - Tacometer_Simulator_SetPeriodMS -This method sets the new period of the output signal. The period is expressed in 
+                [milliseconds] as a 16-bit unsigned integer number. This method is available only if <"Runtime setting type"> 
+                property is set to "interval" .
+   - Tacometer_Simulator_SetRatio16 -This method sets a new duty-cycle ratio. Ratio is expressed as a 16-bit unsigned integer 
+                number. 0 - FFFF value is proportional to ratio 0 - 100%. The method is available only if it is not selected 
+                list of predefined values in <Starting pulse width> property.   Note: Calculated duty depends on the timer 
+                possibilities and on the selected period.
+   - Tacometer_Simulator_SetDutyMS -This method sets the new duty value of the output signal. The duty is expressed in 
+                milliseconds as a 16-bit unsigned integer number. The method is available only if it is not selected list of 
+                predefined values in <Starting pulse width> property.
+
 Module "Cpu"       (component MKL25Z128LK4)
 
 ===================================================================================

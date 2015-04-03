@@ -595,7 +595,7 @@ registers of the peripheral(s) configured by the component.
 **          Period device                                  : TPM1_MOD
 **          Duty device                                    : TPM1_C1V
 **          Output pin                                     : PTA13/TPM1_CH1
-**          Output pin signal                              : Speed_PTE21
+**          Output pin signal                              : Speed_Signal
 **          Counter                                        : TPM1_CNT
 **          Interrupt service/event                        : Disabled
 **          Period                                         : 50 ms
