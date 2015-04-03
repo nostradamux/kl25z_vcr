@@ -6,7 +6,7 @@
 **     Component   : Capture_LDD
 **     Version     : Component 01.010, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2015-03-28, 10:09, # CodeGen: 25
+**     Date/Time   : 2015-04-03, 18:56, # CodeGen: 47
 **     Abstract    :
 **          This component "Capture_LDD" simply implements the capture function
 **          of timer. The counter counts the same way as in free run mode. On
@@ -29,8 +29,8 @@
 **          Event                                          : 
 **            Input pin                                    : PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI
 **            Input pin signal                             : Tacometer_Capture_Signal
-**            Edge                                         : both edges
-**            Maximum time of event                        : 100 ms
+**            Edge                                         : rising edge
+**            Maximum time of event                        : 400 ms
 **          Initialization                                 : 
 **            Enabled in init. code                        : yes
 **            Auto initialization                          : no

@@ -75,6 +75,10 @@ LDD_TError ErrorDirectionCapture, FlagDirectionCapture;
 volatile uint32_t DataDirectionCapture;
 uint32_t DataDirectionCaptureOld;
 
+LDD_TDeviceData *TachometerCapture;
+LDD_TError ErrorTachometerCapture, FlagTachometerCapture;
+volatile uint32_t DataTachometerCapture;
+
 bool debuggingActivated=FALSE;
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -84,6 +88,7 @@ int main(void)
   /* Write your local variable definition here */
   uint32_t dutySpeed_old=0;
   uint32_t dutyDirection_old=0;
+  uint32_t tempTacho=0;
   
   char buffer[10];
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
@@ -96,9 +101,11 @@ int main(void)
   
   #ifndef CAPTURE_AND_GENERATE_DEVICE
   	  Init_Tacometer_Simulator();
+  #else
+  	  ErrorTachometerCapture  = Tacometer_Capture_Init((LDD_TUserData *)NULL);   
   #endif
   
-  ErrorSpeedCapture  = Speed_Capture_Reset(SpeedCapture);                       /* Reset the counter */
+  ErrorSpeedCapture  = Speed_Capture_Reset(SpeedCapture);                     
   FlagSpeedCapture  = 1U;
 
   while (1)
@@ -115,6 +122,11 @@ int main(void)
 		  {
 			  movement.direction=Set_New_Direction();
 			  FlagDirectionCapture=1;
+		  }
+		  if(FlagTachometerCapture == ERR_OK)
+		  {
+			  movement.tacho = Get_Tacometer_Count();
+			  FlagTachometerCapture=1;
 		  }
 		  if(movement.speed!=dutySpeed_old)
 		  {

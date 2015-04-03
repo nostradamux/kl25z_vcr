@@ -3,7 +3,7 @@
   <Header>
     <Name>Input_Capture</Name>
     <SavedBy>Administrador</SavedBy>
-    <ModificationStamp>34</ModificationStamp>
+    <ModificationStamp>37</ModificationStamp>
     <Date>2015-04-03</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.9.0.RT6_b1411-0406</PEversion>
@@ -29,7 +29,7 @@
     <UseExistingModules>true</UseExistingModules>
     <RenamePeripheries>false</RenamePeripheries>
     <Autodependency>true</Autodependency>
-    <ProjectCompNumb>93</ProjectCompNumb>
+    <ProjectCompNumb>96</ProjectCompNumb>
     <DelUnusedPreviouslyGenFiles>true</DelUnusedPreviouslyGenFiles>
     <GeneratedCodeFrozen>false</GeneratedCodeFrozen>
     <AssignInitComponentNameToPrph>true</AssignInitComponentNameToPrph>
@@ -12710,7 +12710,7 @@
         <ItemSymbol>Tmg</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>100 ms</Value>
+        <Value>400 ms</Value>
         <RuntimeSetting>0</RuntimeSetting>
         <ReqDevPrescHigh>-1</ReqDevPrescHigh>
         <ReqDevPrescLow>-1</ReqDevPrescLow>
@@ -12736,7 +12736,7 @@
         <ReqSrcClkPrescSpeedMode5>-1</ReqSrcClkPrescSpeedMode5>
         <ReqSrcClkPrescSpeedMode6>-1</ReqSrcClkPrescSpeedMode6>
         <ReqSrcClkPrescSpeedMode7>-1</ReqSrcClkPrescSpeedMode7>
-        <InitValue>100 ms</InitValue>
+        <InitValue>400 ms</InitValue>
         <Precision>5.0</Precision>
         <PrecInProc>false</PrecInProc>
         <LowLimit />
@@ -13201,7 +13201,7 @@
         <ItemSymbol>Tmg</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>100 ms</Value>
+        <Value>400 ms</Value>
         <RuntimeSetting>0</RuntimeSetting>
         <ReqDevPrescHigh>-1</ReqDevPrescHigh>
         <ReqDevPrescLow>-1</ReqDevPrescLow>
@@ -13227,7 +13227,7 @@
         <ReqSrcClkPrescSpeedMode5>-1</ReqSrcClkPrescSpeedMode5>
         <ReqSrcClkPrescSpeedMode6>-1</ReqSrcClkPrescSpeedMode6>
         <ReqSrcClkPrescSpeedMode7>-1</ReqSrcClkPrescSpeedMode7>
-        <InitValue>100 ms</InitValue>
+        <InitValue>400 ms</InitValue>
         <Precision>5.0</Precision>
         <PrecInProc>false</PrecInProc>
         <LowLimit />
@@ -13686,13 +13686,13 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>3</Index>
+        <Index>1</Index>
       </ItemState>
       <ItemState>
         <ItemSymbol>Tmg</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>100 ms</Value>
+        <Value>400 ms</Value>
         <RuntimeSetting>0</RuntimeSetting>
         <ReqDevPrescHigh>-1</ReqDevPrescHigh>
         <ReqDevPrescLow>-1</ReqDevPrescLow>
@@ -13718,7 +13718,7 @@
         <ReqSrcClkPrescSpeedMode5>-1</ReqSrcClkPrescSpeedMode5>
         <ReqSrcClkPrescSpeedMode6>-1</ReqSrcClkPrescSpeedMode6>
         <ReqSrcClkPrescSpeedMode7>-1</ReqSrcClkPrescSpeedMode7>
-        <InitValue>100 ms</InitValue>
+        <InitValue>400 ms</InitValue>
         <Precision>5.0</Precision>
         <PrecInProc>false</PrecInProc>
         <LowLimit />
@@ -14324,7 +14324,7 @@
         <ReqSrcClkPrescSpeedMode5>-1</ReqSrcClkPrescSpeedMode5>
         <ReqSrcClkPrescSpeedMode6>-1</ReqSrcClkPrescSpeedMode6>
         <ReqSrcClkPrescSpeedMode7>-1</ReqSrcClkPrescSpeedMode7>
-        <InitValue>100 ms</InitValue>
+        <InitValue>400 ms</InitValue>
         <Precision>5.0</Precision>
         <PrecInProc>false</PrecInProc>
         <LowLimit />
@@ -14476,7 +14476,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>TmgChanMaxTime0</ItemSymbol>
-        <Value>100.000006144 ms</Value>
+        <Value>400.000024576 ms</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>Tmg_ChanOffset0</ItemSymbol>
@@ -14874,7 +14874,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>TmgChanMaxTime1</ItemSymbol>
-        <Value>100.000006144 ms</Value>
+        <Value>400.000024576 ms</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>Tmg_ChanOffset1</ItemSymbol>
@@ -15090,11 +15090,11 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>3</Index>
+        <Index>1</Index>
       </ItemState>
       <ItemState>
         <ItemSymbol>TmgChanMaxTime2</ItemSymbol>
-        <Value>100.000006144 ms</Value>
+        <Value>400.000024576 ms</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>Tmg_ChanOffset2</ItemSymbol>

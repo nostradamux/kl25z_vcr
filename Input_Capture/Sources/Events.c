@@ -44,7 +44,11 @@ extern volatile uint32_t DataSpeedCapture;
 
 extern LDD_TDeviceData *DirectionCapture;
 extern LDD_TError ErrorDirectionCapture, FlagDirectionCapture;
-volatile uint32_t DataDirectionCapture;
+extern volatile uint32_t DataDirectionCapture;
+
+extern LDD_TDeviceData *TachometerCapture;
+extern LDD_TError ErrorTachometerCapture, FlagTachometerCapture;
+extern volatile uint32_t DataTachometerCapture;
 
 /*
 ** ===================================================================
@@ -199,6 +203,7 @@ void CheckPoint_OnBlockSent(LDD_TUserData *UserDataPtr)
 void Tacometer_Capture_OnCapture(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+  FlagTachometerCapture = Tacometer_Capture_GetCaptureValue(TachometerCapture, &DataTachometerCapture);	
 }
 
 /*

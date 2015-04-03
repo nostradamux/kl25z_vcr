@@ -22,7 +22,7 @@ typedef struct
  * If is not defined, they will be generated depending on value introduced by 
  * console. 
  */
-//#define CAPTURE_AND_GENERATE_DEVICE 1
+#define CAPTURE_AND_GENERATE_DEVICE 1
 #define VERSION	"VCR_V0_1"
 
 extern bool debuggingActivated;
